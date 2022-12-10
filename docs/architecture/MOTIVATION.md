@@ -73,3 +73,14 @@ Here's a rundown of the specific options needed:
    - TODO:
      - Figure out how to deploy containers to separate node pools
      - Make configs for existing deployments
+
+## Standards
+
+1. Enforcing code quality
+   1. Use precommit
+      1. https://www.conventionalcommits.org/en/v1.0.0/
+      2. https://bongnv.com/blog/2021-08-29-pre-commit-hooks-golang-projects/
+   2. CI + tests
+      1. Block PRs if tests fail
+2. Continuous Delivery
+   1. Whenever a push is made to main with a new version, start Git Release + prompt for release notes.
