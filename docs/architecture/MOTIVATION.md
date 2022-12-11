@@ -25,38 +25,59 @@ Here's a rundown of the specific options needed:
    - Stripe Integration
    - Paypal Integration
 
-1. **Frontend**
+2. **Frontend**
 
    - Next.js with Dockerfile
-   - CRA with Dockerfile
-   - Options for Both
+   - Mid Prio Alternatives
+     - Angular.js with Dockerfile
+     - Vue with Dockerfile
+     - Svelte with Dockerfile
+   - Low Prio Alternatives
+     - Gatsby
+     - Vite
+     - Jekyll
+   - Options for All
      - JS/TS?
      - SCSS vs CSS?
      - Tailwind?
      - Styled Components?
-     - Husky?
-     - Prettier
-     - ESLint
+     - Husky
+       - Prettier?
+       - Commitlint?
+       - ESLint?
      - Use Jest for testing
+   - **Enabled for All**
+     - ESLint
+     - Prettier
 
-1. **Backend**
+3. **Backend**
 
-   - FastAPI with poetry and docker
+   - FastAPI with poetry + Docker
    - Express with Dockerfile
-   - Go Echo API
+   - Go Echo API with Dockerfile
    - Options for all
-   - Database?
-     - SQL
-       - CockroachDB
-       - Postgres
-       - MySQL
-     - No-SQL
-       - MongoDB
-       - ScyllaDB
-       - Redis
-       - Cassandra
+     - Database?
+       - SQL
+         - CockroachDB
+         - Postgres
+         - MySQL
+       - No-SQL
+         - MongoDB
+         - ScyllaDB
+         - Redis
+         - Cassandra
+     - Precommit
+       - Commit lint?
+       - If JS
+         - Prettier?
+         - ESLint?
+       - If Go
+       - If Python
+         - Yapf
+         - Black
+         - Pep8
 
-1. **IAC**
+4. **IAC**
 
    - Docker compose
    - Example Kubernetes Configs
