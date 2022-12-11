@@ -22,13 +22,13 @@ Here's a rundown of the specific options needed:
 
    - Open ID Connect?
    - Username/Passwords?
+   - Stripe Integration
+   - Paypal Integration
 
 2. **Frontend**
 
    - Next.js with Dockerfile
    - CRA with Dockerfile
-   - Stripe Integration
-   - Paypal Integration
    - Options for Both
      - JS/TS?
      - SCSS vs CSS?
