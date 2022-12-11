@@ -25,7 +25,7 @@ Here's a rundown of the specific options needed:
    - Stripe Integration
    - Paypal Integration
 
-2. **Frontend**
+1. **Frontend**
 
    - Next.js with Dockerfile
    - CRA with Dockerfile
@@ -37,10 +37,9 @@ Here's a rundown of the specific options needed:
      - Husky?
      - Prettier
      - ESLint
-     - Docker image name?
      - Use Jest for testing
 
-3. **Backend**
+1. **Backend**
 
    - FastAPI with poetry and docker
    - Express with Dockerfile
@@ -57,7 +56,7 @@ Here's a rundown of the specific options needed:
        - Redis
        - Cassandra
 
-4. **IAC**
+1. **IAC**
 
    - Docker compose
    - Example Kubernetes Configs
