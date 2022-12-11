@@ -13,4 +13,12 @@
 
 # Dependency directories (remove the comment below to include it)
 # vendor/
+
+# For generated templates
 node_modules
+
+# For test coverage
+profile.cov
+
+# Just in-case
+.env
