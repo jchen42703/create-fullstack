@@ -72,3 +72,53 @@ func TestAddTailwind(t *testing.T) {
 	// Integration test this by confirming that adding a new component with tailwind works
 	// Not easily parallelizable because would need to manage port numbers.
 }
+
+func TestInitializeNextDocker(t *testing.T) {
+	outputDir := "test-next-ts-docker"
+	// createNextJsCmd := exec.Command("yarn", "create", "next-app", "--example", "with-typescript", outputDir)
+	createNextJsCmd := exec.Command("yarn", "create", "next-app", "--typescript", "--eslint", outputDir)
+
+	// Cleanup
+	defer func() {
+		os.Chdir("../")
+		err := os.RemoveAll(outputDir)
+		if err != nil {
+			t.Fatalf("failed to clean up test directory: %s", err)
+		}
+
+		cleanupDocker := exec.Command("docker", "image", "rm", "jchen42703/nextjs-test-docker")
+		stdout, err := cleanupDocker.Output()
+		if err != nil {
+			t.Log(stdout)
+			t.Errorf("failed to cleanup docker image")
+		}
+	}()
+
+	writer := log.Writer()
+	createNextJsCmd.Stderr = writer
+	createNextJsCmd.Stdout = writer
+
+	err := createNextJsCmd.Run() //blocks until sub process is complete
+	if err != nil {
+		t.Fatalf("failed to create next js app: %s", err.Error())
+	}
+
+	os.Chdir(outputDir)
+
+	err = augment.InitializeNextDocker(3000)
+	if err != nil {
+		t.Fatalf("failed to initialize docker configs: %s", err.Error())
+	}
+
+	// docker build -t jchen42703/nextjs-test-docker:latest .
+	dockerBuildCmd := exec.Command("docker", "build", "-t", "jchen42703/nextjs-test-docker", ".")
+	dockerBuildCmd.Stderr = writer
+	dockerBuildCmd.Stdout = writer
+
+	err = dockerBuildCmd.Run() //blocks until sub process is complete
+	if err != nil {
+		t.Fatalf("failed to build nextjs docker container: %s", err.Error())
+	}
+
+	// docker run -p 3000:3000 jchen42703/nextjs-test-docker
+}
