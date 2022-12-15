@@ -4,7 +4,7 @@ Describe in detail the changes you are proposing, and the rationale.
 
 See the contributing guide:
 
-https://github.com/hashicorp/terraform/blob/main/.github/CONTRIBUTING.md
+https://github.com/jchen42703/create-fullstack/blob/main/CONTRIBUTING.md
 
 -->
 
@@ -31,7 +31,7 @@ label to enable the backport bot.
 
 -->
 
-1.4.x
+0.0.x
 
 ## Draft CHANGELOG entry
 

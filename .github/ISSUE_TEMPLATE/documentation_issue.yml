@@ -6,10 +6,7 @@ body:
       attributes:
           value: |
               # Thank you for opening a documentation change request.
-
-              Please only use the [hashicorp/terraform](https://github.com/hashicorp/terraform) `Documentation` issue type to report problems with the documentation on [https://www.terraform.io/docs](). Only technical writers (not engineers) monitor this issue type. Report Terraform bugs or feature requests with the `Bug report` or `Feature Request` issue types instead to get engineering attention.
-
-              For general usage questions, please see: https://www.terraform.io/community.html.
+              Please ensure that your request is distinct from other issues. If you have any further questions on the contributing process, please read the CONTRIBUTING.md at https://github.com/jchen42703/create-fullstack/blob/main/CONTRIBUTING.md
 
     - type: textarea
       id: tf-version
