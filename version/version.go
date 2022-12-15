@@ -1,7 +1,9 @@
 // The version package provides a location to set the release versions for all
 // packages to consume, without creating import cycles.
 //
-// This package should not import any other terraform packages.
+// This package should not import any other create-fullstack packages.
+//
+// From: Terraform version/version.go
 package version
 
 import (
