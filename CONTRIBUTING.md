@@ -23,6 +23,15 @@ go build - create-fullstack.exe
 create-fullstack.exe version
 ```
 
+**For autocomplete you must run:**
+
+```bash
+# Linux
+./create-fullstack -install-autocomplete
+```
+
+Then restart your shell.
+
 ## Testing
 
 Regular command:
