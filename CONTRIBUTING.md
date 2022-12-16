@@ -10,6 +10,30 @@ Run:
 go install .
 ```
 
+Make sure you also set up `pre-commit`:
+
+```bash
+pip install pre-commit
+
+pre-commit install
+```
+
+If you want to test if `pre-commit` is working, run:
+
+```bash
+pre-commit run -a
+```
+
+You should get output like:
+
+```bash
+Trim Trailing Whitespace.................................................Passed
+Fix End of Files.........................................................Passed
+Check Yaml...............................................................Passed
+Check for added large files..............................................Passed
+golangci-lint............................................................Passed
+```
+
 ## Running the CLI
 
 ```bash
