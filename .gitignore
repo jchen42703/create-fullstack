@@ -22,3 +22,6 @@ profile.cov
 
 # Just in-case
 .env
+
+main
+create-fullstack

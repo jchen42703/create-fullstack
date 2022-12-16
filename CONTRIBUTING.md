@@ -10,6 +10,28 @@ Run:
 go install .
 ```
 
+## Running the CLI
+
+```bash
+# Linux
+go build -o create-fullstack
+./create-fullstack version
+
+# Windows
+# Not tested
+go build - create-fullstack.exe
+create-fullstack.exe version
+```
+
+**For autocomplete you must run:**
+
+```bash
+# Linux
+./create-fullstack -install-autocomplete
+```
+
+Then restart your shell.
+
 ## Testing
 
 Regular command:
