@@ -13,8 +13,14 @@ go install .
 Make sure you also set up `pre-commit`:
 
 ```bash
+# For managing git hooks
 pip install pre-commit
 
+# For commit lint
+npm install -g @commitlint/cli @commitlint/config-conventional
+
+# Installs the git hooks for you, so whenever you run git commit -m "xxxx", it will run the linters automatically.
+# When the linters find issues, the commit fails.
 pre-commit install
 ```
 
