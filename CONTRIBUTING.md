@@ -10,6 +10,13 @@ Run:
 go install .
 ```
 
+## Running the CLI
+
+```bash
+go build -o main
+./main version
+```
+
 ## Testing
 
 Regular command:
