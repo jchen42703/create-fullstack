@@ -51,11 +51,13 @@ func runMain() int {
 			for name := range Commands {
 				suggestions = append(suggestions, name)
 			}
+
 			suggestion := didyoumean.NameSuggestion(cmd, suggestions)
 			if suggestion != "" {
 				suggestion = fmt.Sprintf(" Did you mean %q?", suggestion)
 			}
-			fmt.Fprintf(os.Stderr, "create-fullstack has no command named %q.%s\n\nTo see all of create-fullstack's top-level commands, run:\n  terraform -help\n\n", cmd, suggestion)
+
+			fmt.Fprintf(os.Stderr, "create-fullstack has no command named %q.%s\n\nTo see all of create-fullstack's top-level commands, run:\n  create-fullstack -help\n\n", cmd, suggestion)
 			return 1
 		}
 	}

@@ -35,7 +35,7 @@ func InitCommands(Ui cli.Ui) map[string]cli.CommandFactory {
 		Ui: Ui,
 	}
 
-	// The command list is included in the terraform -help
+	// The command list is included in the create-fullstack -help
 	// output, which is in turn included in the docs at
 	// website/docs/cli/commands/index.html.markdown; if you
 	// add, remove or reclassify commands then consider updating

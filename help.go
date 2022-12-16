@@ -10,7 +10,7 @@ import (
 	"github.com/mitchellh/cli"
 )
 
-// helpFunc is a cli.HelpFunc that can be used to output the help CLI instructions for Terraform.
+// helpFunc is a cli.HelpFunc that can be used to output the help CLI instructions for create-fullstack.
 func helpFunc(commands map[string]cli.CommandFactory) string {
 	// Determine the maximum key length, and classify based on type
 	var otherCommands []string
@@ -44,7 +44,7 @@ func helpFunc(commands map[string]cli.CommandFactory) string {
 	// website/source/docs/cli/commands/index.html.markdown; if you
 	// change this then consider updating that to match.
 	helpText := fmt.Sprintf(`
-Usage: terraform [global options] <subcommand> [args]
+Usage: create-fullstack [global options] <subcommand> [args]
 The available commands for execution are listed below.
 The primary workflow commands are given first, followed by
 less common or more advanced commands.
@@ -53,8 +53,6 @@ Main commands:
 All other commands:
 %s
 Global options (use these before the subcommand, if any):
-  -chdir=DIR    Switch to a different working directory before executing the
-                given subcommand.
   -help         Show this help output, or the help for a specified subcommand.
   -version      An alias for the "version" subcommand.
 `, listCommands(commands, PrimaryCommands, maxKeyLen), listCommands(commands, otherCommands, maxKeyLen))
