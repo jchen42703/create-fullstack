@@ -21,8 +21,12 @@ func TestAddTailwind(t *testing.T) {
 
 	// Cleanup
 	defer func() {
-		os.Chdir("../")
-		err := os.RemoveAll(outputDir)
+		err := os.Chdir("../")
+		if err != nil {
+			t.Fatalf("failed to change back to reg directory during cleanup: %s", err)
+		}
+
+		err = os.RemoveAll(outputDir)
 		if err != nil {
 			t.Fatalf("failed to clean up test directory: %s", err)
 		}
@@ -38,7 +42,10 @@ func TestAddTailwind(t *testing.T) {
 		t.Fatalf("failed to create next js app: %s", err.Error())
 	}
 
-	os.Chdir(outputDir)
+	err = os.Chdir(outputDir)
+	if err != nil {
+		t.Fatalf("failed to change to output directory: %s", err)
+	}
 
 	err = augment.AddTailwind()
 	if err != nil {
@@ -80,8 +87,12 @@ func TestInitializeNextDocker(t *testing.T) {
 
 	// Cleanup
 	defer func() {
-		os.Chdir("../")
-		err := os.RemoveAll(outputDir)
+		err := os.Chdir("../")
+		if err != nil {
+			t.Fatalf("failed to change back to reg directory during cleanup: %s", err)
+		}
+
+		err = os.RemoveAll(outputDir)
 		if err != nil {
 			t.Fatalf("failed to clean up test directory: %s", err)
 		}
@@ -103,7 +114,10 @@ func TestInitializeNextDocker(t *testing.T) {
 		t.Fatalf("failed to create next js app: %s", err.Error())
 	}
 
-	os.Chdir(outputDir)
+	err = os.Chdir(outputDir)
+	if err != nil {
+		t.Fatalf("failed to change to output directory: %s", err)
+	}
 
 	err = augment.InitializeNextDocker(3000)
 	if err != nil {
