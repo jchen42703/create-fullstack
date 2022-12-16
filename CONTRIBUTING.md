@@ -13,8 +13,14 @@ go install .
 ## Running the CLI
 
 ```bash
-go build -o main
-./main version
+# Linux
+go build -o create-fullstack
+./create-fullstack version
+
+# Windows
+# Not tested
+go build - create-fullstack.exe
+create-fullstack.exe version
 ```
 
 ## Testing
