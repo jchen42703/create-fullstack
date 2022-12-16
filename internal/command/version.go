@@ -1,4 +1,4 @@
-package createcommands
+package command
 
 import (
 	"bytes"

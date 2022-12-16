@@ -1,7 +1,7 @@
 package main
 
 import (
-	"github.com/jchen42703/create-fullstack/internal/createcommands"
+	"github.com/jchen42703/create-fullstack/internal/command"
 	"github.com/jchen42703/create-fullstack/internal/getproviders"
 	"github.com/jchen42703/create-fullstack/version"
 	"github.com/mitchellh/cli"
@@ -31,7 +31,7 @@ var HiddenCommands map[string]struct{}
 // Initializes the commands for the CLI.
 // Inspired by: https://github.com/hashicorp/terraform/blob/main/commands.go
 func InitCommands(Ui cli.Ui) map[string]cli.CommandFactory {
-	baseCommand := createcommands.BaseCommand{
+	baseCommand := command.BaseCommand{
 		Ui: Ui,
 	}
 
@@ -43,7 +43,7 @@ func InitCommands(Ui cli.Ui) map[string]cli.CommandFactory {
 
 	Commands = map[string]cli.CommandFactory{
 		"version": func() (cli.Command, error) {
-			return &createcommands.VersionCommand{
+			return &command.VersionCommand{
 				BaseCommand:       baseCommand,
 				Version:           version.Version,
 				VersionPrerelease: version.Prerelease,
