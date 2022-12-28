@@ -135,3 +135,30 @@ Generating the CI templates should be pretty easy because we'll just need to gen
 2. Runs tests
 
 The rest can be left to the user (i.e. automating releases, uploading to s3/a Digital Ocean space, etc.)
+
+## Dependency Management
+
+Since we're doing everything dynamically, it can be very easy for templates to break if we do not keep dependency versions fixed.
+
+For example, if we add tailwind dynamically, but if the newest version of tailwind breaks the template, then there is not much we can do about it except by periodocially running tests to confirm that the template still works.
+
+**Main dependencies:**
+
+- UI
+  - JS/TS
+    - Next.js
+    - Create React App
+    - Tailwind
+    - SCSS
+    - Husky
+    - Stripe SDK
+- API
+  - Go
+    - Stripe SDK
+- Github Actions
+
+We probably just need to fix the versions whenever we `yarn add` or install something.
+
+Then, if people want to use a more modern version, we can simply create plugin for it.
+
+Then, we can merge it to `main` if it is compatible with the base templates and then bump the version of the CLI.
