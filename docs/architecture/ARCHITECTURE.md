@@ -54,10 +54,9 @@ ui:
     husky:
       commitlint:
         version: default
-    prettier:
-      version: default
-    eslint:
-      version: default
+      format: true
+      lint: true
+
     # If custom base template, then behavior can vary.
     dockerfile: true
     # If custom base template, then behavior can vary.
