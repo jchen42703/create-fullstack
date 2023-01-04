@@ -34,14 +34,25 @@ ui:
   # go, python, javascript, typescript
   lang: typescript
   augment:
-    tailwind: true
-    scss: true
-    styled_components: true
+    tailwind:
+      # one of default, latest or the version number
+      # [package-name]@[version-number]
+      # Whenever, we run commands, we fix the version numbers as part of the default behavior.
+      # But, if you're making a plugin, you should specify the version numebr that works for you.
+      version: default
+    scss:
+      version: default
+    styled_components:
+      version: default
     # Should be null if lang != javascript/typescript
     # Prettier and eslint required for all js/ts
     husky:
-      commitlint: true
-    prettier_eslint: true
+      commitlint:
+        version: default
+    prettier:
+      version: default
+    eslint:
+      version: default
     # If custom base template, then behavior can vary.
     dockerfile: true
     # If custom base template, then behavior can vary.
