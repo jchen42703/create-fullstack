@@ -20,6 +20,7 @@ fullstack:
       # email verification by default
       email_verification: true
       username_is_email: true
+      password_validation: true
     social_sign_in:
       google_callback_url: "http://localhost:3000/dashboard"
       facebook_callback_url: "http://localhost:3000/dashboard"
@@ -78,7 +79,9 @@ api:
   db:
     # one of:
     # postgres, mysql, cockroachdb
-    sql: postgres
+    sql:
+      db_type: postgres
+      startup_script: ""
     no_sql:
       mongodb: true
       redis: true
