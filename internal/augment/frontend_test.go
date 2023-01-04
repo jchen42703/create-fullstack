@@ -34,10 +34,7 @@ func TestAddTailwind(t *testing.T) {
 	}()
 
 	writer := log.Writer()
-	createNextJsCmd.Stderr = writer
-	createNextJsCmd.Stdout = writer
-
-	err := createNextJsCmd.Run() //blocks until sub process is complete
+	err := augment.RunCommand(createNextJsCmd, writer)
 	if err != nil {
 		t.Fatalf("failed to create next js app: %s", err.Error())
 	}
@@ -106,10 +103,7 @@ func TestInitializeNextDocker(t *testing.T) {
 	}()
 
 	writer := log.Writer()
-	createNextJsCmd.Stderr = writer
-	createNextJsCmd.Stdout = writer
-
-	err := createNextJsCmd.Run() //blocks until sub process is complete
+	err := augment.RunCommand(createNextJsCmd, writer)
 	if err != nil {
 		t.Fatalf("failed to create next js app: %s", err.Error())
 	}
@@ -126,10 +120,7 @@ func TestInitializeNextDocker(t *testing.T) {
 
 	// docker build -t jchen42703/nextjs-test-docker:latest .
 	dockerBuildCmd := exec.Command("docker", "build", "-t", "jchen42703/nextjs-test-docker", ".")
-	dockerBuildCmd.Stderr = writer
-	dockerBuildCmd.Stdout = writer
-
-	err = dockerBuildCmd.Run() //blocks until sub process is complete
+	err = augment.RunCommand(dockerBuildCmd, writer)
 	if err != nil {
 		t.Fatalf("failed to build nextjs docker container: %s", err.Error())
 	}

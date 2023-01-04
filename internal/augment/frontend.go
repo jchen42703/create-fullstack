@@ -21,13 +21,9 @@ func AddTailwind() error {
 	}
 
 	for _, cmd := range commands {
-
-		writer := log.Writer()
-		cmd.Stderr = writer
-		cmd.Stdout = writer
-		err := cmd.Run() //blocks until sub process is complete
+		err := RunCommand(cmd, log.Writer()) //blocks until sub process is complete
 		if err != nil {
-			return fmt.Errorf("AddTailwind: '%s' failed with err: %s", cmd.String(), err.Error())
+			return fmt.Errorf("AddTailwind: %s", err.Error())
 		}
 	}
 
