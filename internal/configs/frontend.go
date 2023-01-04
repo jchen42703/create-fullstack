@@ -11,16 +11,17 @@ func (base FrontendBase) String() string {
 	return []string{"Next.js", "CRA"}[base]
 }
 
+type HuskyOptions struct {
+	CommitLint bool
+	Prettier   bool
+	ESLint     bool
+}
+
 type FrontendConfig struct {
 	Base                FrontendBase
-	DesiredImageName    string
 	UseTypescript       bool
 	UseSCSS             bool
 	UseTailwind         bool
 	UseStyledComponents bool
-	HuskyOptions        *struct {
-		CommitLint bool
-		Prettier   bool
-		ESLint     bool
-	}
+	HuskyOpts           *HuskyOptions
 }
