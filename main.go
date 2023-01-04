@@ -4,8 +4,10 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"strings"
 
 	"github.com/jchen42703/create-fullstack/internal/didyoumean"
+	"github.com/jchen42703/create-fullstack/internal/log"
 	"github.com/mitchellh/cli"
 )
 
@@ -15,6 +17,31 @@ func runMain() int {
 		ErrorWriter: os.Stderr,
 		Reader:      os.Stdin,
 	}
+
+	logger, err := log.CreateLogger("./create-fullstack.log")
+	if err != nil {
+		Ui.Error(fmt.Sprintf("Error initializing logger: %s", err.Error()))
+		return 1
+	}
+
+	// These error out for some reason
+	defer func() {
+		if err := logger.Sync(); err != nil {
+			// this sync error is safe to ignore, since stdout doesn't support syncing in Linux/OS X
+			if !strings.HasSuffix(err.Error(), "sync /dev/stdout: invalid argument") {
+				Ui.Error(fmt.Sprintf("Error cleaning up logger: %s", err.Error()))
+			}
+		}
+	}()
+
+	// // Used to return the file in CreateLogger so we could close it here, but idk why that also
+	// // threw an error that it was already closed
+	// defer func() {
+	// 	if err := f.Close(); err != nil {
+	// 		Ui.Error(fmt.Sprintf("Error closing log file: %s", err.Error()))
+	// 	}
+	// }()
+
 	binName := filepath.Base(os.Args[0])
 	args := os.Args[1:]
 	allCommands := InitCommands(Ui)
