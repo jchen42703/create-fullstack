@@ -18,9 +18,17 @@ func runMain() int {
 		Reader:      os.Stdin,
 	}
 
+	colorUi := &cli.ColoredUi{
+		OutputColor: cli.UiColorNone,
+		InfoColor:   cli.UiColorGreen,
+		ErrorColor:  cli.UiColorRed,
+		WarnColor:   cli.UiColorYellow,
+		Ui:          Ui,
+	}
+
 	logger, err := log.CreateLogger("./create-fullstack.log")
 	if err != nil {
-		Ui.Error(fmt.Sprintf("Error initializing logger: %s", err.Error()))
+		colorUi.Error(fmt.Sprintf("Error initializing logger: %s", err.Error()))
 		return 1
 	}
 
@@ -29,7 +37,7 @@ func runMain() int {
 		if err := logger.Sync(); err != nil {
 			// this sync error is safe to ignore, since stdout doesn't support syncing in Linux/OS X
 			if !strings.HasSuffix(err.Error(), "sync /dev/stdout: invalid argument") {
-				Ui.Error(fmt.Sprintf("Error cleaning up logger: %s", err.Error()))
+				colorUi.Error(fmt.Sprintf("Error cleaning up logger: %s", err.Error()))
 			}
 		}
 	}()
@@ -38,13 +46,13 @@ func runMain() int {
 	// // threw an error that it was already closed
 	// defer func() {
 	// 	if err := f.Close(); err != nil {
-	// 		Ui.Error(fmt.Sprintf("Error closing log file: %s", err.Error()))
+	// 		colorUi.Error(fmt.Sprintf("Error closing log file: %s", err.Error()))
 	// 	}
 	// }()
 
 	binName := filepath.Base(os.Args[0])
 	args := os.Args[1:]
-	allCommands := InitCommands(Ui)
+	allCommands := InitCommands(colorUi)
 	cliRunner := &cli.CLI{
 		Name:                  binName,
 		Args:                  args,
@@ -84,14 +92,14 @@ func runMain() int {
 				suggestion = fmt.Sprintf(" Did you mean %q?", suggestion)
 			}
 
-			fmt.Fprintf(os.Stderr, "create-fullstack has no command named %q.%s\n\nTo see all of create-fullstack's top-level commands, run:\n  create-fullstack -help\n\n", cmd, suggestion)
+			colorUi.Error(fmt.Sprintf("create-fullstack has no command named %q.%s\n\nTo see all of create-fullstack's top-level commands, run:\n  create-fullstack -help\n\n", cmd, suggestion))
 			return 1
 		}
 	}
 
 	exitCode, err := cliRunner.Run()
 	if err != nil {
-		Ui.Error(fmt.Sprintf("Error executing CLI: %s", err.Error()))
+		colorUi.Error(fmt.Sprintf("Error executing CLI: %s", err.Error()))
 		return 1
 	}
 
