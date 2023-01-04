@@ -7,6 +7,7 @@
 # Generates everything
 # Infra, ui, backend
 fullstack:
+  output_dir: "./fullstack_app_name"
   payments:
     stripe: true
     paypal: true
@@ -15,14 +16,17 @@ fullstack:
   # Future: auth0
   # Generating auth code took complex and potentially dangerous for this project
   auth:
-    # email verification by default
-    username_password: true
+    username_password:
+      # email verification by default
+      email_verification: true
+      username_is_email: true
     social_sign_in:
-      google: true
-      facebook: true
-      github: true
+      google_callback_url: "http://localhost:3000/dashboard"
+      facebook_callback_url: "http://localhost:3000/dashboard"
+      github_callback_url: "http://localhost:3000/dashboard"
 
 ui:
+  output_dir: "./fullstack_app_name/ui"
   # Base template to augment
   # one of:
   # nextjs, nextjs_ory, create_react_app
@@ -60,6 +64,7 @@ ui:
     ci: git_workflows
 
 api:
+  output_dir: "./fullstack_app_name/api"
   # Base template to augment
   # one of:
   # default, echo, echo_ory, express, fastify, fastapi
@@ -107,6 +112,7 @@ api:
 
 # Tentative as of now
 infra:
+  output_dir: "./fullstack_app_name/infra"
   docker_compose: true
   k8s: true
   nginx: true
