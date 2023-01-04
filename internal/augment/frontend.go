@@ -2,30 +2,33 @@ package augment
 
 import (
 	"fmt"
-	"log"
+	"io"
 	"os"
 	"os/exec"
 
 	"github.com/jchen42703/create-fullstack/internal/directory"
+	"go.uber.org/zap"
 )
 
 // Adds Tailwind to the project following the official docs:
 // https://tailwindcss.com/docs/guides/nextjs
 // This is better than the regular with-tailwind Next.js template because
 // this approach works with Typescript too.
-func AddTailwind() error {
-	log.Print("Adding Tailwind and peer dependencies...\n")
+func AddTailwind(logWriter io.Writer, logger *zap.SugaredLogger) error {
+	logger.Debug("Adding Tailwind and peer dependencies...\n")
 	commands := []*exec.Cmd{
 		exec.Command("yarn", "add", "-D", "tailwindcss", "postcss", "autoprefixer"),
 		exec.Command("npx", "tailwindcss", "init", "-p"),
 	}
 
 	for _, cmd := range commands {
-		err := RunCommand(cmd, log.Writer()) //blocks until sub process is complete
+		err := RunCommand(cmd, logWriter) //blocks until sub process is complete
 		if err != nil {
 			return fmt.Errorf("AddTailwind: %s", err.Error())
 		}
 	}
+
+	logger.Debug("Creating tailwind config...\n")
 
 	tailwindConfig := `/** @type {import('tailwindcss').Config} */
 module.exports = {
@@ -44,6 +47,8 @@ module.exports = {
 	if err != nil {
 		return fmt.Errorf("AddTailwind: writing config failed: %s", err.Error())
 	}
+
+	logger.Debug("Attempting to add the tailwind styles to the global styles...\n")
 
 	// Assume globals.scss/css is in styles/
 	possibleStylesPaths := []string{
@@ -85,6 +90,8 @@ module.exports = {
 	if err != nil {
 		return fmt.Errorf("AddTailwind: writing global styles failed: %s", err.Error())
 	}
+
+	logger.Debug("Successfully added the tailwind styles to the global styles...\n")
 
 	return nil
 }
