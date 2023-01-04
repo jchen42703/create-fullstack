@@ -32,6 +32,8 @@ func runMain() int {
 		return 1
 	}
 
+	sugar := logger.Sugar()
+
 	// These error out for some reason
 	defer func() {
 		if err := logger.Sync(); err != nil {
@@ -57,7 +59,7 @@ func runMain() int {
 		Name:                  binName,
 		Args:                  args,
 		Commands:              allCommands,
-		HelpFunc:              helpFunc,
+		HelpFunc:              createHelpFunc(sugar),
 		HelpWriter:            os.Stdout,
 		Autocomplete:          true,
 		AutocompleteInstall:   "install-autocomplete",

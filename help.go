@@ -3,65 +3,67 @@ package main
 import (
 	"bytes"
 	"fmt"
-	"log"
 	"sort"
 	"strings"
 
 	"github.com/mitchellh/cli"
+	"go.uber.org/zap"
 )
 
 // helpFunc is a cli.HelpFunc that can be used to output the help CLI instructions for create-fullstack.
-func helpFunc(commands map[string]cli.CommandFactory) string {
-	// Determine the maximum key length, and classify based on type
-	var otherCommands []string
-	maxKeyLen := 0
+func createHelpFunc(logger *zap.SugaredLogger) cli.HelpFunc {
+	return func(commands map[string]cli.CommandFactory) string {
+		// Determine the maximum key length, and classify based on type
+		var otherCommands []string
+		maxKeyLen := 0
 
-	for key := range commands {
-		if _, ok := HiddenCommands[key]; ok {
-			// We don't consider hidden commands when deciding the
-			// maximum command length.
-			continue
-		}
+		for key := range commands {
+			if _, ok := HiddenCommands[key]; ok {
+				// We don't consider hidden commands when deciding the
+				// maximum command length.
+				continue
+			}
 
-		if len(key) > maxKeyLen {
-			maxKeyLen = len(key)
-		}
+			if len(key) > maxKeyLen {
+				maxKeyLen = len(key)
+			}
 
-		isOther := true
-		for _, candidate := range PrimaryCommands {
-			if candidate == key {
-				isOther = false
-				break
+			isOther := true
+			for _, candidate := range PrimaryCommands {
+				if candidate == key {
+					isOther = false
+					break
+				}
+			}
+			if isOther {
+				otherCommands = append(otherCommands, key)
 			}
 		}
-		if isOther {
-			otherCommands = append(otherCommands, key)
-		}
+		sort.Strings(otherCommands)
+
+		// The output produced by this is included in the docs at
+		// website/source/docs/cli/commands/index.html.markdown; if you
+		// change this then consider updating that to match.
+		helpText := fmt.Sprintf(`
+	Usage: create-fullstack [global options] <subcommand> [args]
+	The available commands for execution are listed below.
+	The primary workflow commands are given first, followed by
+	less common or more advanced commands.
+	Main commands:
+	%s
+	All other commands:
+	%s
+	Global options (use these before the subcommand, if any):
+	  -help         Show this help output, or the help for a specified subcommand.
+	`, listCommands(commands, PrimaryCommands, maxKeyLen, logger), listCommands(commands, otherCommands, maxKeyLen, logger))
+
+		return strings.TrimSpace(helpText)
 	}
-	sort.Strings(otherCommands)
-
-	// The output produced by this is included in the docs at
-	// website/source/docs/cli/commands/index.html.markdown; if you
-	// change this then consider updating that to match.
-	helpText := fmt.Sprintf(`
-Usage: create-fullstack [global options] <subcommand> [args]
-The available commands for execution are listed below.
-The primary workflow commands are given first, followed by
-less common or more advanced commands.
-Main commands:
-%s
-All other commands:
-%s
-Global options (use these before the subcommand, if any):
-  -help         Show this help output, or the help for a specified subcommand.
-`, listCommands(commands, PrimaryCommands, maxKeyLen), listCommands(commands, otherCommands, maxKeyLen))
-
-	return strings.TrimSpace(helpText)
 }
 
 // listCommands just lists the commands in the map with the
 // given maximum key length.
-func listCommands(allCommands map[string]cli.CommandFactory, order []string, maxKeyLen int) string {
+func listCommands(allCommands map[string]cli.CommandFactory, order []string, maxKeyLen int, logger *zap.SugaredLogger) string {
 	var buf bytes.Buffer
 
 	for _, key := range order {
@@ -76,7 +78,7 @@ func listCommands(allCommands map[string]cli.CommandFactory, order []string, max
 		if err != nil {
 			// This would be really weird since there's no good reason for
 			// any of our command factories to fail.
-			log.Printf("[ERR] cli: Command '%s' failed to load: %s",
+			logger.Errorf("[ERR] cli: Command '%s' failed to load: %s",
 				key, err)
 			continue
 		}
