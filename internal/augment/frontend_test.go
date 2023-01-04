@@ -1,7 +1,6 @@
 package augment_test
 
 import (
-	"log"
 	"os"
 	"os/exec"
 	"strings"
@@ -9,7 +8,36 @@ import (
 
 	"github.com/jchen42703/create-fullstack/internal/augment"
 	"github.com/jchen42703/create-fullstack/internal/directory"
+	"github.com/jchen42703/create-fullstack/internal/log"
+	"go.uber.org/zap"
+	"go.uber.org/zap/zapcore"
+	"go.uber.org/zap/zapio"
 )
+
+// General cleanup function that removes an output directory, and removes the logger file.
+func cleanupFunc(t *testing.T, outputDir string, logFilePath string, logger *zap.Logger) {
+	err := os.Chdir("../")
+	if err != nil {
+		t.Fatalf("failed to change back to reg directory during cleanup: %s", err)
+	}
+
+	err = os.RemoveAll(outputDir)
+	if err != nil {
+		t.Fatalf("failed to clean up test directory: %s", err)
+	}
+
+	err = os.Remove(logFilePath)
+	if err != nil {
+		t.Fatalf("failed to cleanup log: %s", err)
+	}
+
+	if err := logger.Sync(); err != nil {
+		// this sync error is safe to ignore, since stdout doesn't support syncing in Linux/OS X
+		if !strings.HasSuffix(err.Error(), "sync /dev/stdout: invalid argument") {
+			t.Fatalf("Error cleaning up logger: %s", err.Error())
+		}
+	}
+}
 
 func TestAddTailwind(t *testing.T) {
 	// 1. Create next.js project
@@ -20,21 +48,20 @@ func TestAddTailwind(t *testing.T) {
 	createNextJsCmd := exec.Command("yarn", "create", "next-app", "--typescript", "--eslint", outputDir)
 
 	// Cleanup
-	defer func() {
-		err := os.Chdir("../")
-		if err != nil {
-			t.Fatalf("failed to change back to reg directory during cleanup: %s", err)
-		}
+	logFilePath := "./create-fullstack.log"
+	logger, err := log.CreateLogger(logFilePath)
+	if err != nil {
+		t.Fatalf("failed to create logger")
+	}
 
-		err = os.RemoveAll(outputDir)
-		if err != nil {
-			t.Fatalf("failed to clean up test directory: %s", err)
-		}
+	defer cleanupFunc(t, outputDir, logFilePath, logger)
 
-	}()
+	writer := &zapio.Writer{
+		Log:   logger,
+		Level: zapcore.DebugLevel,
+	}
 
-	writer := log.Writer()
-	err := augment.RunCommand(createNextJsCmd, writer)
+	err = augment.RunCommand(createNextJsCmd, writer)
 	if err != nil {
 		t.Fatalf("failed to create next js app: %s", err.Error())
 	}
@@ -44,7 +71,7 @@ func TestAddTailwind(t *testing.T) {
 		t.Fatalf("failed to change to output directory: %s", err)
 	}
 
-	err = augment.AddTailwind()
+	err = augment.AddTailwind(writer, logger.Sugar())
 	if err != nil {
 		t.Fatalf("failed to augment with tailwind: %s", err.Error())
 	}
@@ -82,18 +109,16 @@ func TestInitializeNextDocker(t *testing.T) {
 	// createNextJsCmd := exec.Command("yarn", "create", "next-app", "--example", "with-typescript", outputDir)
 	createNextJsCmd := exec.Command("yarn", "create", "next-app", "--typescript", "--eslint", outputDir)
 
+	logFilePath := "./create-fullstack.log"
+	logger, err := log.CreateLogger(logFilePath)
+	if err != nil {
+		t.Fatalf("failed to create logger")
+	}
+
 	// Cleanup
+	defer cleanupFunc(t, outputDir, logFilePath, logger)
+	// Cleanup docker image
 	defer func() {
-		err := os.Chdir("../")
-		if err != nil {
-			t.Fatalf("failed to change back to reg directory during cleanup: %s", err)
-		}
-
-		err = os.RemoveAll(outputDir)
-		if err != nil {
-			t.Fatalf("failed to clean up test directory: %s", err)
-		}
-
 		cleanupDocker := exec.Command("docker", "image", "rm", "jchen42703/nextjs-test-docker")
 		stdout, err := cleanupDocker.Output()
 		if err != nil {
@@ -102,8 +127,12 @@ func TestInitializeNextDocker(t *testing.T) {
 		}
 	}()
 
-	writer := log.Writer()
-	err := augment.RunCommand(createNextJsCmd, writer)
+	writer := &zapio.Writer{
+		Log:   logger,
+		Level: zapcore.DebugLevel,
+	}
+
+	err = augment.RunCommand(createNextJsCmd, writer)
 	if err != nil {
 		t.Fatalf("failed to create next js app: %s", err.Error())
 	}
