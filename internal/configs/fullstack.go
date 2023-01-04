@@ -22,7 +22,7 @@ type AuthOptions struct {
 }
 
 type FullstackConfig struct {
-	OutputDirectoryName string          `yaml:"output_dir"`
+	OutputDirectoryPath string          `yaml:"output_dir"`
 	AuthOpts            AuthOptions     `yaml:"auth"`
 	PaymentsOpts        PaymentsOptions `yaml:"payments"`
 }
