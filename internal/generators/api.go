@@ -7,13 +7,13 @@ import (
 	"github.com/jchen42703/create-fullstack/internal/configs"
 )
 
-type BaseAPIGenerator struct {
+type BaseApiGenerator struct {
 }
 
-func NewBaseAPIGenerator() *BaseFrontendGenerator {
-	return &BaseFrontendGenerator{}
+func NewBaseAPIGenerator() *BaseApiGenerator {
+	return &BaseApiGenerator{}
 }
 
-func (g *BaseAPIGenerator) GenerateTemplate(cfg configs.BackendConfig) {
+func (g *BaseApiGenerator) GenerateTemplate(cfg *configs.ApiConfig) {
 	fmt.Println(cfg)
 }

@@ -7,8 +7,8 @@ type HuskyOptions struct {
 	Lint   bool `yaml:"lint"`
 }
 
-type FrontendAugmentOptions struct {
-	AddSCSS             *PackageOptions `yaml:"scss"`
+type UiAugmentOptions struct {
+	AddScss             *PackageOptions `yaml:"scss"`
 	AddTailwind         *PackageOptions `yaml:"tailwind"`
 	AddStyledComponents *PackageOptions `yaml:"styled_components"`
 	HuskyOpts           *HuskyOptions   `yaml:"husky"`
@@ -18,12 +18,12 @@ type FrontendAugmentOptions struct {
 		AddPRTemplates    bool `yaml:"pr_templates"`
 	} `yaml:"git"`
 
-	AddCI string `yaml:"ci"`
+	AddCi string `yaml:"ci"`
 }
 
-type FrontendConfig struct {
-	OutputDirectoryPath string                  `yaml:"output_dir"`
-	Base                string                  `yaml:"base"`
-	Language            string                  `yaml:"lang"`
-	AugmentOpts         *FrontendAugmentOptions `yaml:"augment"`
+type UiConfig struct {
+	OutputDirectoryPath string            `yaml:"output_dir"`
+	Base                string            `yaml:"base"`
+	Language            string            `yaml:"lang"`
+	AugmentOpts         *UiAugmentOptions `yaml:"augment"`
 }

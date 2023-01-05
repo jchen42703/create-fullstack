@@ -7,13 +7,13 @@ import (
 	"github.com/jchen42703/create-fullstack/internal/configs"
 )
 
-type BaseFrontendGenerator struct {
+type BaseUiGenerator struct {
 }
 
-func NewFrontendGenerator() *BaseFrontendGenerator {
-	return &BaseFrontendGenerator{}
+func NewBaseUiGenerator() *BaseUiGenerator {
+	return &BaseUiGenerator{}
 }
 
-func (g *BaseFrontendGenerator) GenerateTemplate(cfg configs.FrontendConfig) {
+func (g *BaseUiGenerator) GenerateTemplate(cfg *configs.UiConfig) {
 	fmt.Println(cfg)
 }

@@ -2,14 +2,14 @@ package generators
 
 import "github.com/jchen42703/create-fullstack/internal/configs"
 
-type FrontendTemplateGenerator interface {
-	GenerateTemplate(config configs.FrontendConfig)
+type UiTemplateGenerator interface {
+	GenerateTemplate(config *configs.UiConfig)
 }
 
-type BackendTemplateGenerator interface {
-	GenerateTemplate(config configs.BackendConfig)
+type ApiTemplateGenerator interface {
+	GenerateTemplate(config *configs.ApiConfig)
 }
 
 type FullstackTemplateGenerator interface {
-	GenerateTemplate(config configs.FullstackConfig)
+	GenerateTemplate(config *configs.FullstackConfig)
 }

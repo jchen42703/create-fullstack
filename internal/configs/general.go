@@ -1,7 +1,8 @@
 package configs
 
+// Generic config for template generation + augmentation.
 type GeneralConfig struct {
 	FullstackCfg *FullstackConfig `yaml:"fullstack"`
-	UICfg        *FrontendConfig  `yaml:"frontend"`
-	APICfg       *BackendConfig   `yaml:"api"`
+	UiCfg        *UiConfig        `yaml:"frontend"`
+	ApiCfg       *ApiConfig       `yaml:"api"`
 }
