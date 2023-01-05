@@ -53,7 +53,7 @@ type ApiAugmentationOptions struct {
 type ApiConfig struct {
 	OutputDirectoryPath string                  `yaml:"output_dir"`
 	Base                string                  `yaml:"base"`
-	Language            string                  `yaml:"lang"`
+	Language            PROGRAMMING_LANGUAGE    `yaml:"lang"`
 	AugmentOpts         *ApiAugmentationOptions `yaml:"augment"`
 	Databases           struct {
 		// Assume one SQL database type.

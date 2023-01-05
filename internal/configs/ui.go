@@ -22,8 +22,8 @@ type UiAugmentOptions struct {
 }
 
 type UiConfig struct {
-	OutputDirectoryPath string            `yaml:"output_dir"`
-	Base                string            `yaml:"base"`
-	Language            string            `yaml:"lang"`
-	AugmentOpts         *UiAugmentOptions `yaml:"augment"`
+	OutputDirectoryPath string               `yaml:"output_dir"`
+	Base                string               `yaml:"base"`
+	Language            PROGRAMMING_LANGUAGE `yaml:"lang"`
+	AugmentOpts         *UiAugmentOptions    `yaml:"augment"`
 }
