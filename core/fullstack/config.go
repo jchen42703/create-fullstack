@@ -1,4 +1,4 @@
-package configs
+package fullstack
 
 type PaymentsOptions struct {
 	UseStripe bool `yaml:"stripe"`
@@ -21,7 +21,7 @@ type AuthOptions struct {
 	UsernamePasswordOpts *UsernamePasswordOptions `yaml:"username_password"`
 }
 
-type FullstackConfig struct {
+type TemplateConfig struct {
 	OutputDirectoryPath string          `yaml:"output_dir"`
 	AuthOpts            AuthOptions     `yaml:"auth"`
 	PaymentsOpts        PaymentsOptions `yaml:"payments"`
