@@ -1,4 +1,12 @@
-# Contributor's Guide
+# Contributor's Guide <!-- omit in toc -->
+
+## Table of Contents <!-- omit in toc -->
+
+- [Getting Started](#getting-started)
+- [Running the CLI](#running-the-cli)
+- [Testing](#testing)
+- [Naming](#naming)
+- [Terminology](#terminology)
 
 ## Getting Started
 
@@ -77,3 +85,21 @@ go test ./... -count=1 -coverpkg=./... -coverprofile=profile.cov ./... && go too
 ```
 
 Feel free to add the `-v` flag if you want the logs.
+
+## Naming
+
+All names should be `camelCase`. Do not all uppercase acronyms/abbreviations. For example:
+
+```bash
+# Do this:
+HtmlRequest, ApiGenerator
+
+# Not this:
+HTMLRequest, APIGenerator
+```
+
+## Terminology
+
+- Use API over Backend
+  - This is because backend can refer to an API or CLI backend.
+- Use UI over Frontend
