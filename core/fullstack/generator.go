@@ -3,16 +3,17 @@ package fullstack
 import "fmt"
 
 type FullstackTemplateGenerator interface {
-	GenerateTemplate(config *TemplateConfig)
+	GenerateTemplate(config *TemplateConfig) error
 }
 
 type BaseFullstackGenerator struct {
 }
 
-func NewBaseFullstackGenerator() *BaseFullstackGenerator {
+func NewBaseGenerator() *BaseFullstackGenerator {
 	return &BaseFullstackGenerator{}
 }
 
-func (g *BaseFullstackGenerator) GenerateTemplate(cfg TemplateConfig) {
+func (g *BaseFullstackGenerator) GenerateTemplate(cfg *TemplateConfig) error {
 	fmt.Println(cfg)
+	return nil
 }

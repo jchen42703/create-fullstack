@@ -6,16 +6,17 @@ import (
 )
 
 type UiTemplateGenerator interface {
-	GenerateTemplate(config *TemplateConfig)
+	GenerateTemplate(config *TemplateConfig) error
 }
 
 type BaseUiGenerator struct {
 }
 
-func NewBaseUiGenerator() *BaseUiGenerator {
+func NewBaseGenerator() *BaseUiGenerator {
 	return &BaseUiGenerator{}
 }
 
-func (g *BaseUiGenerator) GenerateTemplate(cfg TemplateConfig) {
+func (g *BaseUiGenerator) GenerateTemplate(cfg *TemplateConfig) error {
 	fmt.Println(cfg)
+	return nil
 }

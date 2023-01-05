@@ -6,16 +6,17 @@ import (
 )
 
 type ApiTemplateGenerator interface {
-	GenerateTemplate(config *TemplateConfig)
+	GenerateTemplate(config *TemplateConfig) error
 }
 
 type BaseApiGenerator struct {
 }
 
-func NewBaseAPIGenerator() *BaseApiGenerator {
+func NewBaseGenerator() *BaseApiGenerator {
 	return &BaseApiGenerator{}
 }
 
-func (g *BaseApiGenerator) GenerateTemplate(cfg *TemplateConfig) {
+func (g *BaseApiGenerator) GenerateTemplate(cfg *TemplateConfig) error {
 	fmt.Println(cfg)
+	return nil
 }
