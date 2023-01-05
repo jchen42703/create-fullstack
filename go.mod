@@ -7,6 +7,7 @@ require (
 	github.com/hashicorp/go-version v1.6.0
 	github.com/mitchellh/cli v1.1.5
 	go.uber.org/zap v1.24.0
+	gopkg.in/yaml.v2 v2.4.0
 )
 
 require (
