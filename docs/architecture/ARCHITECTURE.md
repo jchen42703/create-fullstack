@@ -1,5 +1,36 @@
 # Architecture
 
+## Requirements
+
+### 1.1 Generate Template with CLI UI
+
+`create_fullstack gen`
+
+- Brings up CLI UI
+- The CLI UI should build the YAML config and pass it to the `YAMLPipeline`
+
+### 1.2 Generate Template with Yaml Config
+
+`create_fullstack gen -f cfg.yml`
+
+### 1.3 Augment current repository
+
+`create_fullstack augment [ui/api/infra] <TYPE>`
+
+`<TYPE>` should be one of the various augmentation types for the corresponding category.
+
+## Pipeline
+
+```
+YamlPipeline
+  Reads yaml config from filepath and converts to struct `GeneralConfig`
+  Validates the `GeneralConfig`
+    if err -> CLI fatals
+  Calls GenerateFullstackTemplate(GeneralConfig)
+    Calls FullstackGenerator
+      Calls UiGenerator, ApiGenerator
+```
+
 ## User Config
 
 ```yaml
