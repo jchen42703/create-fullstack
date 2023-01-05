@@ -5,7 +5,7 @@ import (
 	"fmt"
 )
 
-type UiTemplateGenerator interface {
+type TemplateGenerator interface {
 	GenerateTemplate(config *TemplateConfig) error
 }
 

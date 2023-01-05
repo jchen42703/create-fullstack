@@ -2,7 +2,7 @@ package fullstack
 
 import "fmt"
 
-type FullstackTemplateGenerator interface {
+type TemplateGenerator interface {
 	GenerateTemplate(config *TemplateConfig) error
 }
 

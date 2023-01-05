@@ -5,7 +5,7 @@ import (
 	"fmt"
 )
 
-type ApiTemplateGenerator interface {
+type TemplateGenerator interface {
 	GenerateTemplate(config *TemplateConfig) error
 }
 
