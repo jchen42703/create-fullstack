@@ -1,5 +1,5 @@
 package aug
 
-type TemplateAugmenter interface {
+type TemplateAugmentor interface {
 	Augment() error
 }
