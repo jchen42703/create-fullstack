@@ -3,7 +3,7 @@ package aug
 import (
 	"fmt"
 
-	"github.com/jchen42703/create-fullstack/cmd/opts"
+	"github.com/jchen42703/create-fullstack/core/opts"
 )
 
 type HuskyOptions struct {

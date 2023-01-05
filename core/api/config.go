@@ -1,8 +1,8 @@
 package api
 
 import (
-	"github.com/jchen42703/create-fullstack/cmd/aug"
-	"github.com/jchen42703/create-fullstack/cmd/lang"
+	"github.com/jchen42703/create-fullstack/core/aug"
+	"github.com/jchen42703/create-fullstack/core/lang"
 )
 
 type SQL_DB_TYPE int

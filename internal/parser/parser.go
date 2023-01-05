@@ -3,9 +3,9 @@ package parser
 import (
 	"os"
 
-	"github.com/jchen42703/create-fullstack/cmd/api"
-	"github.com/jchen42703/create-fullstack/cmd/fullstack"
-	"github.com/jchen42703/create-fullstack/cmd/ui"
+	"github.com/jchen42703/create-fullstack/core/api"
+	"github.com/jchen42703/create-fullstack/core/fullstack"
+	"github.com/jchen42703/create-fullstack/core/ui"
 	"gopkg.in/yaml.v2"
 )
 

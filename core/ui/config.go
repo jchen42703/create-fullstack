@@ -1,8 +1,8 @@
 package ui
 
 import (
-	"github.com/jchen42703/create-fullstack/cmd/lang"
-	"github.com/jchen42703/create-fullstack/cmd/opts"
+	"github.com/jchen42703/create-fullstack/core/lang"
+	"github.com/jchen42703/create-fullstack/core/opts"
 )
 
 type HuskyOptions struct {

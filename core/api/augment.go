@@ -3,7 +3,7 @@ package api
 import (
 	"fmt"
 
-	"github.com/jchen42703/create-fullstack/cmd/lang"
+	"github.com/jchen42703/create-fullstack/core/lang"
 )
 
 // Add a dockerfile and .dockerignore.
