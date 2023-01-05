@@ -3,20 +3,29 @@ package parser
 import (
 	"os"
 
-	"github.com/jchen42703/create-fullstack/internal/configs"
+	"github.com/jchen42703/create-fullstack/cmd/api"
+	"github.com/jchen42703/create-fullstack/cmd/fullstack"
+	"github.com/jchen42703/create-fullstack/cmd/ui"
 	"gopkg.in/yaml.v2"
 )
 
+// Generic config for template generation + augmentation.
+type GeneralConfig struct {
+	FullstackCfg *fullstack.TemplateConfig `yaml:"fullstack"`
+	UiCfg        *ui.TemplateConfig        `yaml:"frontend"`
+	ApiCfg       *api.TemplateConfig       `yaml:"api"`
+}
+
 // convert yaml file to a config
-func YamlToAugmentCfg(filename string) (*configs.GeneralConfig, error) {
+func YamlToTemplateCfg(filename string) (*GeneralConfig, error) {
 
 	file, err := os.ReadFile(filename)
 
 	if err != nil {
-		return &configs.GeneralConfig{}, err
+		return &GeneralConfig{}, err
 	}
 
-	var generalConfig configs.GeneralConfig
+	var generalConfig GeneralConfig
 
 	err = yaml.Unmarshal(file, &generalConfig)
 

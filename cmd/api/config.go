@@ -1,4 +1,9 @@
-package configs
+package api
+
+import (
+	"github.com/jchen42703/create-fullstack/cmd/aug"
+	"github.com/jchen42703/create-fullstack/cmd/lang"
+)
 
 type SQL_DB_TYPE int
 
@@ -39,7 +44,7 @@ type PreCommitOptions struct {
 }
 
 type ApiAugmentationOptions struct {
-	HuskyOpts     *HuskyOptions     `yaml:"husky"`
+	HuskyOpts     *aug.HuskyOptions `yaml:"husky"`
 	PreCommitOpts *PreCommitOptions `yaml:"pre_commit"`
 	AddDockerfile bool              `yaml:"dockerfile"`
 	GitOpts       *struct {
@@ -50,11 +55,11 @@ type ApiAugmentationOptions struct {
 	AddCi string `yaml:"ci"`
 }
 
-type ApiConfig struct {
-	OutputDirectoryPath string                  `yaml:"output_dir"`
-	Base                string                  `yaml:"base"`
-	Language            PROGRAMMING_LANGUAGE    `yaml:"lang"`
-	AugmentOpts         *ApiAugmentationOptions `yaml:"augment"`
+type TemplateConfig struct {
+	OutputDirectoryPath string                    `yaml:"output_dir"`
+	Base                string                    `yaml:"base"`
+	Language            lang.PROGRAMMING_LANGUAGE `yaml:"lang"`
+	AugmentOpts         *ApiAugmentationOptions   `yaml:"augment"`
 	Databases           struct {
 		// Assume one SQL database type.
 		// TODO: consider RDS/Spanner support

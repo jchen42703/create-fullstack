@@ -1,4 +1,4 @@
-package configs
+package lang
 
 type PROGRAMMING_LANGUAGE string
 

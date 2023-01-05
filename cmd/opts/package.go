@@ -1,4 +1,4 @@
-package configs
+package opts
 
 // Options for when you add a package.
 // This exists to make it easy to manage dependencies across the CLI.
