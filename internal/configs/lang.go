@@ -8,4 +8,5 @@ const (
 	Go         PROGRAMMING_LANGUAGE = "go"
 	Java       PROGRAMMING_LANGUAGE = "java"
 	Python     PROGRAMMING_LANGUAGE = "python"
+	Other      PROGRAMMING_LANGUAGE = "other"
 )
