@@ -13,7 +13,7 @@ func TestBaseTemplateCache(t *testing.T) {
 	cache := testutil.NewBaseTemplateCache()
 	// Create test dir
 	testDirPath := "./test-dir"
-	err := os.MkdirAll(testDirPath, 0777)
+	err := os.MkdirAll(testDirPath, directory.READ_WRITE_EXEC_PERM)
 	if err != nil {
 		t.Fatalf("failed to create test dir: %s", err)
 	}

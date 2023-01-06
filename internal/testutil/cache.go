@@ -28,7 +28,7 @@ func (c *BaseTemplateCache) GetTemplateAndCopy(selectedTemplate, outputDir strin
 	}
 
 	// Copy to output dir
-	if err := os.MkdirAll(outputDir, 0777); err != nil {
+	if err := os.MkdirAll(outputDir, directory.READ_WRITE_EXEC_PERM); err != nil {
 		return fmt.Errorf("failed to create outputDir: %s", err)
 	}
 
