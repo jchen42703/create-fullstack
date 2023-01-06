@@ -8,6 +8,7 @@ import (
 	"github.com/cli/cli/v2/pkg/iostreams"
 	"github.com/jchen42703/create-fullstack/cmd/context"
 	"github.com/jchen42703/create-fullstack/cmd/root"
+	"github.com/jchen42703/create-fullstack/internal/executable"
 	"github.com/jchen42703/create-fullstack/internal/log"
 	"github.com/mitchellh/cli"
 )
@@ -42,13 +43,25 @@ func runMain() exitCode {
 		WarnColor:   cli.UiColorYellow,
 		Ui:          Ui,
 	}
-
 	// TODO: Check for CLI updates
+
+	// TODO: dynamically get the log file path for different OSes
+	logFilePath := "./create-fullstack.log"
 	// Initialize logger. Uses CFS_LOG_LVL env var to determine the log level.
-	logger, err := log.CreateLogger("./create-fullstack.log")
+	logger, err := log.CreateLogger(logFilePath)
 	if err != nil {
 		colorUi.Error(fmt.Sprintf("Error initializing logger: %s", err.Error()))
 		return exitError
+	}
+
+	// TODO: set the pager command for making viewing logs cleaner.
+	io := iostreams.System()
+	cmdCtx := &context.CmdContext{
+		Version:        "0.0.0-dev",
+		BuildDate:      "2023-01-05",
+		IoStreams:      io,
+		ExecutableName: executable.GetPath("create-fullstack"),
+		Logger:         logger,
 	}
 
 	defer func() {
@@ -73,16 +86,6 @@ func runMain() exitCode {
 	// 5. provide completions for aliases and extensions (includes plugin commands)
 	// 6. Executes the rootCmd
 	// 7. Checks if it errors out. Handles the error to provide a better UX.
-
-	// TODO: set the pager command for making viewing logs cleaner.
-	io := iostreams.System()
-	cmdCtx := &context.CmdContext{
-		Logger:         logger,
-		Version:        "0.0.0-dev",
-		BuildDate:      "2023-01-05",
-		ExecutableName: "create-fullstack",
-		IoStreams:      io,
-	}
 
 	rootCmd := root.NewCmdRoot(cmdCtx)
 	err = rootCmd.Execute()
