@@ -57,15 +57,11 @@ go build -o create-fullstack
 
 # Windows
 # Not tested
-go build - create-fullstack.exe
+go build -o create-fullstack.exe
 create-fullstack.exe version
-```
 
-**For autocomplete you must run:**
-
-```bash
-# Linux
-./create-fullstack -install-autocomplete
+# Or:
+go install . && $HOME/go/bin/create-fullstack --help
 ```
 
 Then restart your shell.

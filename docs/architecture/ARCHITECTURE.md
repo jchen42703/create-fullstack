@@ -19,6 +19,18 @@
 
 `<TYPE>` should be one of the various augmentation types for the corresponding category.
 
+## 1.4 Install Plugins
+
+`create-fullstack plugins install ...`
+
+## 1.5 Check Installed Plugins + Versions
+
+`create-fullstack plugins list`
+
+## 1.6 Check CLI version
+
+## 1.7 Get CLI Help
+
 ## Pipeline
 
 ```
