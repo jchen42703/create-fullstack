@@ -6,6 +6,7 @@ import (
 	"strings"
 
 	"github.com/jchen42703/create-fullstack/cmd/context"
+	"github.com/jchen42703/create-fullstack/internal/getproviders"
 	"github.com/spf13/cobra"
 )
 
@@ -31,7 +32,8 @@ func Format(version, buildDate string) string {
 		dateStr = fmt.Sprintf(" (%s)", buildDate)
 	}
 
-	return fmt.Sprintf("create-fullstack version %s%s\n%s\n", version, dateStr, changelogURL(version))
+	platform := getproviders.CurrentPlatform
+	return fmt.Sprintf("create-fullstack version %s%s\n%s\n%s\n", version, dateStr, changelogURL(version), platform)
 }
 
 func changelogURL(version string) string {
