@@ -12,6 +12,8 @@ import (
 	"github.com/spf13/cobra"
 )
 
+// Creates the main entrypoint for the Cobra command runner.
+// - The root command manages the top level commands and command groups.
 func NewCmdRoot(cmdCtx *context.CmdContext) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "create-fullstack <command> <subcommand> [flags]",

@@ -6,8 +6,8 @@ import (
 	"github.com/spf13/cobra"
 )
 
+// Creates the UI template augmentation command.
 func NewUiCmd() *cobra.Command {
-	// uiCmd represents the ui command
 	uiCmd := &cobra.Command{
 		Use:     "ui",
 		GroupID: "augment",

@@ -6,6 +6,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
+// Creates the API template augmentation command.
 func NewApiCmd() *cobra.Command {
 	apiCmd := &cobra.Command{
 		Use:     "api",

@@ -6,6 +6,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
+// Creates the `augment` command with the appropriate subcommands.
 func NewCmd() *cobra.Command {
 	augCmd := &cobra.Command{
 		Use:     "augment",

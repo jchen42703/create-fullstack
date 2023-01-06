@@ -6,6 +6,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
+// Creates the fullstack template augmentation command.
 func NewFullstackCmd() *cobra.Command {
 	// apiCmd represents the api command
 	fullstackCmd := &cobra.Command{

@@ -11,6 +11,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
+// Creates the generator command.
 func NewCmd(cmdCtx *context.CmdContext) *cobra.Command {
 	genCmd := &cobra.Command{
 		Use:     "gen",

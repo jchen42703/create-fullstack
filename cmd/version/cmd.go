@@ -24,6 +24,7 @@ func NewCmd(cmdCtx *context.CmdContext) *cobra.Command {
 	return cmd
 }
 
+// Builds the version string to display.
 func Format(version, buildDate string) string {
 	version = strings.TrimPrefix(version, "v")
 
@@ -36,6 +37,7 @@ func Format(version, buildDate string) string {
 	return fmt.Sprintf("create-fullstack version %s%s\n%s\n%s\n", version, dateStr, changelogURL(version), platform)
 }
 
+// Creates the release url.
 func changelogURL(version string) string {
 	path := "https://github.com/jchen42703/create-fullstack"
 	r := regexp.MustCompile(`^v?\d+\.\d+\.\d+(-[\w.]+)?$`)
