@@ -50,7 +50,7 @@ func CreateLogger(logFilePath string) (*zap.Logger, error) {
 		))
 
 	logger := zap.New(core)
-	err = SetLoggerLevel("CREATE_FULLSTACK_LOG_LVL", atom)
+	err = SetLoggerLevel("CFS_LOG_LVL", atom)
 	if err != nil {
 		logger.Debug("using default logger level: WARN")
 	}
