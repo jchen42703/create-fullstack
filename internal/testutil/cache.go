@@ -9,7 +9,7 @@ import (
 )
 
 type BaseTemplateCache struct {
-	mu            sync.RWMutex
+	mu            sync.Mutex
 	TemplatePaths map[string]string
 }
 
@@ -39,8 +39,12 @@ func (c *BaseTemplateCache) GetTemplateAndCopy(selectedTemplate, outputDir strin
 	return nil
 }
 
+// Adds template to the cache. Will update any template reservations in InProgressTemplates if applicable.
 func (c *BaseTemplateCache) AddTemplate(templateName, templatePath string) {
 	defer c.mu.Unlock()
 	c.mu.Lock()
+
 	c.TemplatePaths[templateName] = templatePath
 }
+
+var TemplateCache = NewBaseTemplateCache()

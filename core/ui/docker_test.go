@@ -15,10 +15,7 @@ import (
 
 func TestInitializeNextDocker(t *testing.T) {
 	outputDir := "test-next-ts-docker"
-	// createNextJsCmd := exec.Command("yarn", "create", "next-app", "--example", "with-typescript", outputDir)
-	createNextJsCmd := exec.Command("yarn", "create", "next-app", "--typescript", "--eslint", outputDir)
-
-	logFilePath := "./create-fullstack.log"
+	logFilePath := "./create-fullstack-docker.log"
 	logger, err := log.CreateLogger(logFilePath)
 	if err != nil {
 		t.Fatalf("failed to create logger")
@@ -26,6 +23,7 @@ func TestInitializeNextDocker(t *testing.T) {
 
 	// Cleanup
 	defer testutil.CleanupUiTest(t, outputDir, logFilePath, logger)
+
 	// Cleanup docker image
 	defer func() {
 		cleanupDocker := exec.Command("docker", "image", "rm", "jchen42703/nextjs-test-docker")
@@ -41,9 +39,18 @@ func TestInitializeNextDocker(t *testing.T) {
 		Level: zapcore.DebugLevel,
 	}
 
-	err = run.Cmd(createNextJsCmd, writer)
+	baseTemplate := "test-next-ts"
+	err = testutil.TemplateCache.GetTemplateAndCopy(baseTemplate, outputDir)
+	// Only create base template if one does not exist already
 	if err != nil {
-		t.Fatalf("failed to create next js app: %s", err.Error())
+		testutil.CreateTemplate(t, baseTemplate, writer)
+	}
+
+	// Copy the base template to outputDir
+	err = testutil.TemplateCache.GetTemplateAndCopy(baseTemplate, outputDir)
+	if err != nil {
+		// Should not ever happen
+		t.Fatalf("failed to get template after caching it: %s", err)
 	}
 
 	err = os.Chdir(outputDir)

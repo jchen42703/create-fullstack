@@ -2,11 +2,9 @@ package ui_test
 
 import (
 	"os"
-	"os/exec"
 	"strings"
 	"testing"
 
-	"github.com/jchen42703/create-fullstack/core/run"
 	"github.com/jchen42703/create-fullstack/core/ui"
 	"github.com/jchen42703/create-fullstack/internal/directory"
 	"github.com/jchen42703/create-fullstack/internal/log"
@@ -16,30 +14,35 @@ import (
 )
 
 func TestAddTailwind(t *testing.T) {
-	// 1. Create next.js project
-	// 2. Add Tailwind to it
-	// 3. Check that files were properly created
-	outputDir := "test-next-ts"
-	// createNextJsCmd := exec.Command("yarn", "create", "next-app", "--example", "with-typescript", outputDir)
-	createNextJsCmd := exec.Command("yarn", "create", "next-app", "--typescript", "--eslint", outputDir)
-
-	// Cleanup
-	logFilePath := "./create-fullstack.log"
+	outputDir := "test-next-ts-tailwind"
+	logFilePath := "./create-fullstack-tailwind.log"
 	logger, err := log.CreateLogger(logFilePath)
 	if err != nil {
 		t.Fatalf("failed to create logger")
 	}
 
+	// Cleanup
 	defer testutil.CleanupUiTest(t, outputDir, logFilePath, logger)
-
 	writer := &zapio.Writer{
 		Log:   logger,
 		Level: zapcore.DebugLevel,
 	}
 
-	err = run.Cmd(createNextJsCmd, writer)
+	// 1. Create next.js project
+	// 2. Add Tailwind to it
+	// 3. Check that files were properly created
+	baseTemplate := "test-next-ts"
+	err = testutil.TemplateCache.GetTemplateAndCopy(baseTemplate, outputDir)
+	// Only create base template if one does not exist already
 	if err != nil {
-		t.Fatalf("failed to create next js app: %s", err.Error())
+		testutil.CreateTemplate(t, baseTemplate, writer)
+	}
+
+	// Copy the base template to outputDir
+	err = testutil.TemplateCache.GetTemplateAndCopy(baseTemplate, outputDir)
+	if err != nil {
+		// Should not ever happen
+		t.Fatalf("failed to get template after caching it: %s", err)
 	}
 
 	err = os.Chdir(outputDir)
