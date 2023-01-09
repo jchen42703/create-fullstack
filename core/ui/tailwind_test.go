@@ -109,6 +109,8 @@ func TestTailwindAugmenter(t *testing.T) {
 		// Run tests
 		err = augmenter.Augment(testWd)
 		if err != nil {
+			// Prints logs on error
+			t.Log(testutil.GetLogs(filepath.Join(testWd, "create-fullstack.log")))
 			t.Fatalf("err augmenting dir: %s", err)
 		}
 
