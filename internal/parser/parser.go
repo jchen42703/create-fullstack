@@ -12,7 +12,7 @@ import (
 // Generic config for template generation + augmentation.
 type GeneralConfig struct {
 	FullstackCfg *fullstack.TemplateConfig `yaml:"fullstack"`
-	UiCfg        *ui.TemplateConfig        `yaml:"frontend"`
+	UiCfg        *ui.TemplateConfig        `yaml:"ui"`
 	ApiCfg       *api.TemplateConfig       `yaml:"api"`
 }
 
