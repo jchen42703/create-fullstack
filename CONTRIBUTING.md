@@ -7,6 +7,8 @@
 - [Testing](#testing)
 - [Naming](#naming)
 - [Terminology](#terminology)
+- [CLI Error Handling](#cli-error-handling)
+- [Testing Philosophy](#testing-philosophy)
 
 ## Getting Started
 
@@ -99,3 +101,16 @@ HTMLRequest, APIGenerator
 - Use API over Backend
   - This is because backend can refer to an API or CLI backend.
 - Use UI over Frontend
+
+## CLI Error Handling
+
+<!-- TODO -->
+
+## Testing Philosophy
+
+- Unit tests should test implementation only. Does the function do what you expect it to produce?
+  - I.e. is the function/class add a dockerfile in the way you expected?
+- Integration tests should test functionality. Does the function result in the overall outcome you expect?
+  - I.e. does adding a dockerfile allow you to successfully `docker build`?
+
+Testing this way allows us to create lean unit tests, while also making room for testing functionality.
