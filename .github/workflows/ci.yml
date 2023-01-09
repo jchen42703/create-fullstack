@@ -38,6 +38,7 @@ jobs:
 
             - name: Debug
               run: yarn -v
+                  ls -l
 
             - name: Build
               run: go build -v ./...
