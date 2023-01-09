@@ -37,7 +37,8 @@ jobs:
                   node-version: "18.13.0"
 
             - name: Debug
-              run: yarn -v
+              run: |
+                  yarn -v
                   ls -l
 
             - name: Build
