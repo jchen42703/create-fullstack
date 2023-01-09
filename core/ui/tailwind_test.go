@@ -77,7 +77,9 @@ func TestTailwindAugmenter(t *testing.T) {
 		// Run tests
 		err = augmenter.Augment(testWd)
 		if err == nil || !strings.HasSuffix(err.Error(), "template must have a globals css or scss file for path ''") {
-			t.Fatalf("should raise err looking for globals css/scss file")
+			// Prints logs on error
+			t.Log(testutil.GetLogs(filepath.Join(testWd, "create-fullstack.log")))
+			t.Fatalf("should raise err looking for globals css/scss file, err: %s", err)
 		}
 	})
 
@@ -107,6 +109,8 @@ func TestTailwindAugmenter(t *testing.T) {
 		// Run tests
 		err = augmenter.Augment(testWd)
 		if err != nil {
+			// Prints logs on error
+			t.Log(testutil.GetLogs(filepath.Join(testWd, "create-fullstack.log")))
 			t.Fatalf("err augmenting dir: %s", err)
 		}
 
