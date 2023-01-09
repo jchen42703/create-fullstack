@@ -36,6 +36,9 @@ jobs:
                   #   current Node LTS
                   node-version: "18.13.0"
 
+            - name: Debug
+              run: yarn -v
+
             - name: Build
               run: go build -v ./...
 
