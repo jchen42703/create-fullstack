@@ -41,6 +41,23 @@ func initTailwindTest(t *testing.T, testDir string) (string, *ui.TailwindAugment
 	return testWd, augmenter
 }
 
+func initDockerTest(t *testing.T, testDir string) string {
+	// Create test files and test in a separate directory.
+	wd, err := os.Getwd()
+	if err != nil {
+		t.Fatalf("failed to Getwd: %s", err)
+	}
+
+	// Create test working dir + logger
+	testWd := filepath.Join(wd, testDir)
+	err = os.Mkdir(testWd, directory.READ_WRITE_EXEC_PERM)
+	if err != nil {
+		t.Fatalf("failed to mk test dir: %s", err)
+	}
+
+	return testWd
+}
+
 func TestNextAugmentations(t *testing.T) {
 	t.Cleanup(func() {
 		// Remove all cached templates
@@ -51,17 +68,28 @@ func TestNextAugmentations(t *testing.T) {
 
 	t.Run("InitializeDocker", func(t *testing.T) {
 		outputDir := "test-next-ts-docker"
-		logFilePath := "./create-fullstack-docker.log"
+		testWd := initDockerTest(t, outputDir)
+		logFilePath := filepath.Join(testWd, "create-fullstack-docker.log")
 		logger, err := log.CreateLogger(logFilePath)
 		if err != nil {
 			t.Fatalf("failed to create logger")
 		}
 
 		// Cleanup
-		defer testutil.CleanupUiTest(t, outputDir, logFilePath, logger)
-
-		// Cleanup docker image
 		defer func() {
+			err := os.RemoveAll(testWd)
+			if err != nil {
+				t.Errorf("failed to cleanup wd: %s", testWd)
+			}
+
+			if err := logger.Sync(); err != nil {
+				// this sync error is safe to ignore, since stdout doesn't support syncing in Linux/OS X
+				if !strings.HasSuffix(err.Error(), "sync /dev/stdout: invalid argument") {
+					t.Fatalf("Error cleaning up logger: %s", err.Error())
+				}
+			}
+
+			// Cleanup docker image
 			cleanupDocker := exec.Command("docker", "image", "rm", "jchen42703/nextjs-test-docker")
 			stdout, err := cleanupDocker.Output()
 			if err != nil {
@@ -89,18 +117,12 @@ func TestNextAugmentations(t *testing.T) {
 			t.Fatalf("failed to get template after caching it: %s", err)
 		}
 
-		err = os.Chdir(outputDir)
-		if err != nil {
-			t.Fatalf("failed to change to output directory: %s", err)
-		}
-
-		err = ui.InitializeNextDocker(3000)
+		err = ui.InitializeNextDocker(testWd, 3000, true)
 		if err != nil {
 			t.Fatalf("failed to initialize docker configs: %s", err.Error())
 		}
 
-		// docker build -t jchen42703/nextjs-test-docker:latest .
-		dockerBuildCmd := exec.Command("docker", "build", "-t", "jchen42703/nextjs-test-docker", ".")
+		dockerBuildCmd := exec.Command("docker", "build", "-t", "jchen42703/nextjs-test-docker", testWd)
 		err = run.Cmd(dockerBuildCmd, writer)
 		if err != nil {
 			t.Fatalf("failed to build nextjs docker container: %s", err.Error())
@@ -116,6 +138,13 @@ func TestNextAugmentations(t *testing.T) {
 			err := os.RemoveAll(testWd)
 			if err != nil {
 				t.Errorf("failed to cleanup wd: %s", testWd)
+			}
+
+			if err := augmenter.Logger.Sync(); err != nil {
+				// this sync error is safe to ignore, since stdout doesn't support syncing in Linux/OS X
+				if !strings.HasSuffix(err.Error(), "sync /dev/stdout: invalid argument") {
+					t.Fatalf("Error cleaning up logger: %s", err.Error())
+				}
 			}
 		}()
 

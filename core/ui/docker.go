@@ -3,11 +3,13 @@ package ui
 import (
 	"fmt"
 	"os"
+	"path/filepath"
 
 	"github.com/jchen42703/create-fullstack/internal/directory"
 )
 
-func InitializeNextDocker(portNum int) error {
+// Initializes a Next.js app be buildable by docker.
+func InitializeNextDocker(workingDir string, portNum int, expose bool) error {
 	newNextConfig := `/** @type {import('next').NextConfig} */
 const nextConfig = {
 	reactStrictMode: true,
@@ -20,7 +22,8 @@ const nextConfig = {
 
 module.exports = nextConfig;
 `
-	err := os.WriteFile("./next.config.js", []byte(newNextConfig), directory.READ_WRITE_PERM)
+	nextCfgPath := filepath.Join(workingDir, "next.config.js")
+	err := os.WriteFile(nextCfgPath, []byte(newNextConfig), directory.READ_WRITE_PERM)
 	if err != nil {
 		return fmt.Errorf("InitializeNextDocker: failed to write next.config.js: %s", err.Error())
 	}
@@ -34,12 +37,13 @@ README.md
 .git
 `
 
-	err = os.WriteFile(".dockerignore", []byte(newDockerIgnore), directory.READ_WRITE_PERM)
+	dockerIgnorePath := filepath.Join(workingDir, ".dockerignore")
+	err = os.WriteFile(dockerIgnorePath, []byte(newDockerIgnore), directory.READ_WRITE_PERM)
 	if err != nil {
 		return fmt.Errorf("InitializeNextDocker: failed to write .dockerignore: %s", err.Error())
 	}
 
-	newDockerFile := fmt.Sprintf(`# Install dependencies only when needed
+	newDockerFile := `# Install dependencies only when needed
 FROM node:16-alpine AS deps
 # Check https://github.com/nodejs/docker-node/tree/b4117f9333da4138b03a546ec926ef50a31506c3#nodealpine to understand why libc6-compat might be needed.
 RUN apk add --no-cache libc6-compat
@@ -89,13 +93,19 @@ COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
 
 USER nextjs
 
-EXPOSE %d
+`
+	if expose {
+		newDockerFile += fmt.Sprintf("EXPOSE %d\n", portNum)
+	}
 
+	newDockerFile += fmt.Sprintf(`
 ENV PORT %d
 
 CMD ["node", "server.js"]
-`, portNum, portNum)
-	err = os.WriteFile("Dockerfile", []byte(newDockerFile), directory.READ_WRITE_PERM)
+`, portNum)
+
+	dockerfilePath := filepath.Join(workingDir, "Dockerfile")
+	err = os.WriteFile(dockerfilePath, []byte(newDockerFile), directory.READ_WRITE_PERM)
 	if err != nil {
 		return fmt.Errorf("InitializeNextDocker: failed to write Dockerfile: %s", err.Error())
 	}
