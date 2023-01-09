@@ -5,6 +5,7 @@ import (
 	"io"
 	"os"
 	"os/exec"
+	"path/filepath"
 
 	"github.com/jchen42703/create-fullstack/core/lang"
 	"github.com/jchen42703/create-fullstack/core/run"
@@ -38,7 +39,7 @@ func NewTailwindAugmenter(progLang lang.PROGRAMMING_LANGUAGE, logger *zap.Logger
 // https://tailwindcss.com/docs/guides/nextjs
 // This is better than the regular with-tailwind Next.js template because
 // this approach works with Typescript too.
-func (a *TailwindAugmenter) Augment() error {
+func (a *TailwindAugmenter) Augment(workingDir string) error {
 	// var err error
 	// switch a.Lang {
 	// case lang.Go:
@@ -59,8 +60,8 @@ func (a *TailwindAugmenter) Augment() error {
 
 	a.Logger.Debug("Adding Tailwind and peer dependencies...\n")
 	commands := []*exec.Cmd{
-		exec.Command("yarn", "add", "-D", "tailwindcss", "postcss", "autoprefixer"),
-		exec.Command("npx", "tailwindcss", "init", "-p"),
+		exec.Command("yarn", "--cwd", workingDir, "add", "-D", "tailwindcss", "postcss", "autoprefixer"),
+		exec.Command("yarn", "--cwd", workingDir, "tailwindcss", "init", "-p"),
 	}
 
 	for _, cmd := range commands {
@@ -85,7 +86,8 @@ module.exports = {
 };
 `
 
-	err := os.WriteFile("./tailwind.config.js", []byte(tailwindConfig), directory.READ_WRITE_PERM)
+	tailwindCfgPath := filepath.Join(workingDir, "tailwind.config.js")
+	err := os.WriteFile(tailwindCfgPath, []byte(tailwindConfig), directory.READ_WRITE_PERM)
 	if err != nil {
 		return fmt.Errorf("AddTailwind: writing config failed: %s", err.Error())
 	}
@@ -94,16 +96,17 @@ module.exports = {
 
 	// Assume globals.scss/css is in styles/
 	possibleStylesPaths := []string{
-		"./styles/globals.css",
-		"./styles/globals.scss",
+		filepath.Join("styles", "globals.css"),
+		filepath.Join("styles", "globals.scss"),
 	}
 
 	// Checks if any of the path exists and tries to match
 	globalStylesPath := ""
 	for _, stylesPath := range possibleStylesPaths {
 		var exists bool
-		if exists, err = directory.Exists(stylesPath); exists {
-			globalStylesPath = stylesPath
+		fullPath := filepath.Join(workingDir, stylesPath)
+		if exists, err = directory.Exists(fullPath); exists {
+			globalStylesPath = fullPath
 			break
 		}
 	}
