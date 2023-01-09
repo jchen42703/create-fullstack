@@ -1,0 +1,85 @@
+ui:
+    output_dir: "./fullstack_app_name/ui"
+    # Base template to augment
+    # one of:
+    # nextjs, nextjs_ory, create_react_app
+    # - can support others like angular, vue, svelte gatsby, vite, etc.
+    # If not one of those:
+    # Check if it's a git url: and git clone
+    # If not: throw error
+    base: nextjs
+    # go, python, javascript, typescript
+    lang: typescript
+    augment:
+        tailwind:
+            # one of default, latest or the version number
+            # [package-name]@[version-number]
+            # Whenever, we run commands, we fix the version numbers as part of the default behavior.
+            # But, if you're making a plugin, you should specify the version numebr that works for you.
+            version: default
+        scss:
+            version: default
+        styled_components:
+            version: default
+        # Should be null if lang != javascript/typescript
+        # Prettier and eslint required for all js/ts
+        husky:
+            commitlint:
+                version: default
+            format: true
+            lint: true
+
+        # If custom base template, then behavior can vary.
+        dockerfile: true
+        # If custom base template, then behavior can vary.
+        # I.e. circleci, travisci, jenkins, git_workflows
+        ci: git_workflows
+
+api:
+    output_dir: "./fullstack_app_name/api"
+    # Base template to augment
+    # one of:
+    # default, echo, echo_ory, express, fastify, fastapi
+    # - can support others like gin, chi
+    # If not one of those:
+    # Check if it's a git url: and git clone
+    # If not: throw error
+    base: echo
+    lang: go
+    # Not too sure about this option
+    # db:
+    #     # one of:
+    #     # postgres, mysql, cockroachdb
+    #     sql:
+    #         db_type: postgres
+    #         startup_script: ""
+    #     no_sql:
+    #         mongodb: true
+    #         redis: true
+    #         cassandra: true
+    #         scylladb: true
+    augment:
+        # js-only
+        # husky:
+        #   commitlint: true
+        # If not javascript/typescript, husky is null
+        husky: null
+        # anything besides js
+        pre_commit:
+            lint: true
+            # null if you don't want a formatter
+            # format: null
+            format:
+                # Go just has go_fmt
+                # Python formatters:
+                # yapf, black, pep8
+                formatter: black
+
+        # if custom base template, then behavior can vary.
+        dockerfile: true
+        git:
+            issue_templates: true
+            pr_templates: true
+        # If custom base template, then behavior can vary.
+        # I.e. circleci, travisci, jenkins, git_workflows
+        ci: git_workflows
