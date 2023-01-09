@@ -10,13 +10,34 @@ import (
 	"github.com/jchen42703/create-fullstack/core/run"
 	"github.com/jchen42703/create-fullstack/internal/directory"
 	"go.uber.org/zap"
+	"go.uber.org/zap/zapcore"
+	"go.uber.org/zap/zapio"
 )
 
 // Adds Tailwind to the repository
 type TailwindAugmenter struct {
-	Lang lang.PROGRAMMING_LANGUAGE
+	Lang      lang.PROGRAMMING_LANGUAGE
+	LogWriter io.Writer
+	Logger    *zap.SugaredLogger
 }
 
+func NewTailwindAugmenter(progLang lang.PROGRAMMING_LANGUAGE, logger *zap.Logger, logLvl zapcore.Level) *TailwindAugmenter {
+	writer := &zapio.Writer{
+		Log:   logger,
+		Level: logLvl,
+	}
+
+	return &TailwindAugmenter{
+		Lang:      progLang,
+		LogWriter: writer,
+		Logger:    logger.Sugar(),
+	}
+}
+
+// Adds Tailwind to the project following the official docs:
+// https://tailwindcss.com/docs/guides/nextjs
+// This is better than the regular with-tailwind Next.js template because
+// this approach works with Typescript too.
 func (a *TailwindAugmenter) Augment() error {
 	// var err error
 	// switch a.Lang {
@@ -36,28 +57,20 @@ func (a *TailwindAugmenter) Augment() error {
 	// 	return fmt.Errorf("failed to gen api dockerfile: %s", err)
 	// }
 
-	return nil
-}
-
-// Adds Tailwind to the project following the official docs:
-// https://tailwindcss.com/docs/guides/nextjs
-// This is better than the regular with-tailwind Next.js template because
-// this approach works with Typescript too.
-func AddTailwind(logWriter io.Writer, logger *zap.SugaredLogger) error {
-	logger.Debug("Adding Tailwind and peer dependencies...\n")
+	a.Logger.Debug("Adding Tailwind and peer dependencies...\n")
 	commands := []*exec.Cmd{
 		exec.Command("yarn", "add", "-D", "tailwindcss", "postcss", "autoprefixer"),
 		exec.Command("npx", "tailwindcss", "init", "-p"),
 	}
 
 	for _, cmd := range commands {
-		err := run.Cmd(cmd, logWriter) //blocks until sub process is complete
+		err := run.Cmd(cmd, a.LogWriter) //blocks until sub process is complete
 		if err != nil {
-			return fmt.Errorf("AddTailwind: %s", err.Error())
+			return fmt.Errorf("TailwindAugmenter Augment: %s", err.Error())
 		}
 	}
 
-	logger.Debug("Creating tailwind config...\n")
+	a.Logger.Debug("Creating tailwind config...\n")
 
 	tailwindConfig := `/** @type {import('tailwindcss').Config} */
 module.exports = {
@@ -77,7 +90,7 @@ module.exports = {
 		return fmt.Errorf("AddTailwind: writing config failed: %s", err.Error())
 	}
 
-	logger.Debug("Attempting to add the tailwind styles to the global styles...\n")
+	a.Logger.Debug("Attempting to add the tailwind styles to the global styles...\n")
 
 	// Assume globals.scss/css is in styles/
 	possibleStylesPaths := []string{
@@ -120,7 +133,7 @@ module.exports = {
 		return fmt.Errorf("AddTailwind: writing global styles failed: %s", err.Error())
 	}
 
-	logger.Debug("Successfully added the tailwind styles to the global styles...\n")
+	a.Logger.Debug("Successfully added the tailwind styles to the global styles...\n")
 
 	return nil
 }

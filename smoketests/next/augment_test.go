@@ -6,6 +6,7 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/jchen42703/create-fullstack/core/lang"
 	"github.com/jchen42703/create-fullstack/core/run"
 	"github.com/jchen42703/create-fullstack/core/ui"
 	"github.com/jchen42703/create-fullstack/internal/directory"
@@ -120,7 +121,8 @@ func TestNextAugmentations(t *testing.T) {
 			t.Fatalf("failed to change to output directory: %s", err)
 		}
 
-		err = ui.AddTailwind(writer, logger.Sugar())
+		augmenter := ui.NewTailwindAugmenter(lang.Typescript, logger, zapcore.DebugLevel)
+		err = augmenter.Augment()
 		if err != nil {
 			t.Fatalf("failed to augment with tailwind: %s", err.Error())
 		}
