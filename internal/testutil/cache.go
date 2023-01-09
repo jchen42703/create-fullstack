@@ -6,6 +6,7 @@ import (
 	"sync"
 
 	"github.com/jchen42703/create-fullstack/internal/directory"
+	cp "github.com/otiai10/copy"
 )
 
 type BaseTemplateCache struct {
@@ -32,8 +33,15 @@ func (c *BaseTemplateCache) GetTemplateAndCopy(selectedTemplate, outputDir strin
 		return fmt.Errorf("failed to create outputDir: %s", err)
 	}
 
-	if err := directory.CopyDirectory(cachedTemplatePath, outputDir); err != nil {
-		return fmt.Errorf("GetTemplateAndCopy: failed to copy to outputDir: %s\n", err)
+	// Doesn't copy symlinks (bugged)
+	opts := cp.Options{
+		OnSymlink: func(src string) cp.SymlinkAction {
+			return cp.Skip
+		},
+	}
+
+	if err := cp.Copy(cachedTemplatePath, outputDir, opts); err != nil {
+		return fmt.Errorf("failed to copy to outputDir: %s\n", err)
 	}
 
 	return nil
