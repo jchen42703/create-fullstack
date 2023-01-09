@@ -11,52 +11,10 @@ import (
 	"github.com/jchen42703/create-fullstack/core/run"
 	"github.com/jchen42703/create-fullstack/core/ui"
 	"github.com/jchen42703/create-fullstack/internal/directory"
-	"github.com/jchen42703/create-fullstack/internal/log"
 	"github.com/jchen42703/create-fullstack/internal/testutil"
 	"go.uber.org/zap/zapcore"
 	"go.uber.org/zap/zapio"
 )
-
-func initTailwindTest(t *testing.T, testDir string) (string, *ui.TailwindAugmenter) {
-	// Create test files and test in a separate directory.
-	wd, err := os.Getwd()
-	if err != nil {
-		t.Fatalf("failed to Getwd: %s", err)
-	}
-
-	// Create test working dir + logger
-	testWd := filepath.Join(wd, testDir)
-	err = os.Mkdir(testWd, directory.READ_WRITE_EXEC_PERM)
-	if err != nil {
-		t.Fatalf("failed to mk test dir: %s", err)
-	}
-
-	logFilePath := filepath.Join(testWd, "create-fullstack-tailwind.log")
-	logger, err := log.CreateLogger(logFilePath)
-	if err != nil {
-		t.Fatalf("failed to create logger")
-	}
-
-	augmenter := ui.NewTailwindAugmenter(lang.Typescript, logger, zapcore.DebugLevel)
-	return testWd, augmenter
-}
-
-func initDockerTest(t *testing.T, testDir string) string {
-	// Create test files and test in a separate directory.
-	wd, err := os.Getwd()
-	if err != nil {
-		t.Fatalf("failed to Getwd: %s", err)
-	}
-
-	// Create test working dir + logger
-	testWd := filepath.Join(wd, testDir)
-	err = os.Mkdir(testWd, directory.READ_WRITE_EXEC_PERM)
-	if err != nil {
-		t.Fatalf("failed to mk test dir: %s", err)
-	}
-
-	return testWd
-}
 
 func TestNextAugmentations(t *testing.T) {
 	t.Cleanup(func() {
@@ -67,26 +25,17 @@ func TestNextAugmentations(t *testing.T) {
 	})
 
 	t.Run("InitializeDocker", func(t *testing.T) {
-		outputDir := "test-next-ts-docker"
-		testWd := initDockerTest(t, outputDir)
-		logFilePath := filepath.Join(testWd, "create-fullstack-docker.log")
-		logger, err := log.CreateLogger(logFilePath)
+		testDir := "test-next-ts-docker"
+		logger, testWd, err := testutil.CreateTestDirAndLogger(testDir)
 		if err != nil {
-			t.Fatalf("failed to create logger")
+			t.Fatalf("CreateTestDirAndLogger: %s", err)
 		}
 
 		// Cleanup
 		defer func() {
-			err := os.RemoveAll(testWd)
+			err := testutil.CleanupBaseTest(testWd, logger)
 			if err != nil {
-				t.Errorf("failed to cleanup wd: %s", testWd)
-			}
-
-			if err := logger.Sync(); err != nil {
-				// this sync error is safe to ignore, since stdout doesn't support syncing in Linux/OS X
-				if !strings.HasSuffix(err.Error(), "sync /dev/stdout: invalid argument") {
-					t.Fatalf("Error cleaning up logger: %s", err.Error())
-				}
+				t.Errorf("CleanupBaseTest: %s", err)
 			}
 
 			// Cleanup docker image
@@ -104,14 +53,14 @@ func TestNextAugmentations(t *testing.T) {
 		}
 
 		baseTemplate := "test-next-ts"
-		err = testutil.TemplateCache.GetTemplateAndCopy(baseTemplate, outputDir)
+		err = testutil.TemplateCache.GetTemplateAndCopy(baseTemplate, testWd)
 		// Only create base template if one does not exist already
 		if err != nil {
 			testutil.CreateTemplate(t, baseTemplate, writer)
 		}
 
 		// Copy the base template to outputDir
-		err = testutil.TemplateCache.GetTemplateAndCopy(baseTemplate, outputDir)
+		err = testutil.TemplateCache.GetTemplateAndCopy(baseTemplate, testWd)
 		if err != nil {
 			// Should not ever happen
 			t.Fatalf("failed to get template after caching it: %s", err)
@@ -133,26 +82,25 @@ func TestNextAugmentations(t *testing.T) {
 
 	t.Run("AddTailwind", func(t *testing.T) {
 		testDir := "test-next-ts-tailwind"
-		testWd, augmenter := initTailwindTest(t, testDir)
-		defer func() {
-			err := os.RemoveAll(testWd)
-			if err != nil {
-				t.Errorf("failed to cleanup wd: %s", testWd)
-			}
+		logger, testWd, err := testutil.CreateTestDirAndLogger(testDir)
+		if err != nil {
+			t.Fatalf("CreateTestDirAndLogger: %s", err)
+		}
 
-			if err := augmenter.Logger.Sync(); err != nil {
-				// this sync error is safe to ignore, since stdout doesn't support syncing in Linux/OS X
-				if !strings.HasSuffix(err.Error(), "sync /dev/stdout: invalid argument") {
-					t.Fatalf("Error cleaning up logger: %s", err.Error())
-				}
+		defer func() {
+			err := testutil.CleanupBaseTest(testWd, logger)
+			if err != nil {
+				t.Errorf("CleanupBaseTest: %s", err)
 			}
 		}()
+
+		augmenter := ui.NewTailwindAugmenter(lang.Typescript, logger, zapcore.DebugLevel)
 
 		// 1. Create next.js project
 		// 2. Add Tailwind to it
 		// 3. Check that files were properly created
 		baseTemplate := "test-next-ts"
-		err := testutil.TemplateCache.GetTemplateAndCopy(baseTemplate, testWd)
+		err = testutil.TemplateCache.GetTemplateAndCopy(baseTemplate, testWd)
 		// Only create base template if one does not exist already
 		if err != nil {
 			testutil.CreateTemplate(t, baseTemplate, augmenter.LogWriter)
