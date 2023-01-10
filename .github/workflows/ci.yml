@@ -41,18 +41,6 @@ jobs:
                   yarn -v
                   ls -l
 
-            - name: Debug script
-              run: |
-                  yarn init -y
-                  yarn add -D tailwindcss
-
-            - name: Debug 2
-              run: |
-                  mkdir test-dir
-                  DEBUG_WORKING_DIR=$(pwd)/test-dir
-                  yarn --cwd $DEBUG_WORKING_DIR init -y
-                  yarn --cwd $DEBUG_WORKING_DIR add -D tailwindcss
-
             - name: Build
               run: go build -v ./...
 
