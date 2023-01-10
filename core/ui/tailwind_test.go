@@ -52,7 +52,7 @@ func initProjWithGlobalCss(workingDirectory string, writer io.Writer) error {
 
 func TestTailwindAugmenter(t *testing.T) {
 	t.Run("NoGlobalsStyles", func(t *testing.T) {
-		t.Parallel()
+		// t.Parallel()
 		testDir := "test-next-ts-tailwind"
 		logger, testWd, err := testutil.CreateTestDirAndLogger(testDir)
 		if err != nil {
@@ -84,7 +84,7 @@ func TestTailwindAugmenter(t *testing.T) {
 	})
 
 	t.Run("WithGlobalsStylesCss", func(t *testing.T) {
-		t.Parallel()
+		// t.Parallel()
 		testDir := "test-next-ts-tailwind-css"
 		logger, testWd, err := testutil.CreateTestDirAndLogger(testDir)
 		if err != nil {
