@@ -1,0 +1,37 @@
+ui:
+    output_dir: "./fullstack_app_name/ui"
+    # Base template to augment
+    # one of:
+    # nextjs, nextjs_ory, create_react_app
+    # - can support others like angular, vue, svelte gatsby, vite, etc.
+    # If not one of those:
+    # Check if it's a git url: and git clone
+    # If not: throw error
+    base: nextjs
+    # go, python, javascript, typescript
+    lang: typescript
+    augment:
+        tailwind:
+            # one of default, latest or the version number
+            # [package-name]@[version-number]
+            # Whenever, we run commands, we fix the version numbers as part of the default behavior.
+            # But, if you're making a plugin, you should specify the version numebr that works for you.
+            version: default
+        scss:
+            version: default
+        styled_components:
+            version: default
+        # Should be null if lang != javascript/typescript
+        # Prettier and eslint required for all js/ts
+        husky:
+            commitlint:
+                version: default
+        prettier:
+            version: default
+        eslint:
+            version: default
+        # If custom base template, then behavior can vary.
+        dockerfile: true
+        # If custom base template, then behavior can vary.
+        # I.e. circleci, travisci, jenkins, git_workflows
+        ci: git_workflows

@@ -5,30 +5,30 @@ import (
 	"github.com/jchen42703/create-fullstack/core/lang"
 )
 
-type SQL_DB_TYPE int
+type SQL_DB_TYPE string
 
 const (
-	CockroachDB SQL_DB_TYPE = iota
-	PostgreSQL
-	MySQL
+	CockroachDB SQL_DB_TYPE = "cockroachdb"
+	PostgreSQL  SQL_DB_TYPE = "postgres"
+	MySQL       SQL_DB_TYPE = "mysql"
 )
 
-func (base SQL_DB_TYPE) String() string {
-	return []string{"CockroachDB", "PostgreSQL", "MySQL"}[base]
-}
+// func (base SQL_DB_TYPE) String() string {
+// 	return []string{"CockroachDB", "PostgreSQL", "MySQL"}[base]
+// }
 
-type NO_SQL_DB_TYPE int
+// type NO_SQL_DB_TYPE int
 
-const (
-	MongoDB NO_SQL_DB_TYPE = iota
-	ScyllaDB
-	Redis
-	Cassandra
-)
+// const (
+// 	MongoDB NO_SQL_DB_TYPE = iota
+// 	ScyllaDB
+// 	Redis
+// 	Cassandra
+// )
 
-func (base NO_SQL_DB_TYPE) String() string {
-	return []string{"MongoDB", "ScyllaDB", "Redis", "Cassandra"}[base]
-}
+// func (base NO_SQL_DB_TYPE) String() string {
+// 	return []string{"MongoDB", "ScyllaDB", "Redis", "Cassandra"}[base]
+// }
 
 type SqlDbOptions struct {
 	DbType SQL_DB_TYPE `yaml:"db_type"`
@@ -67,6 +67,11 @@ type TemplateConfig struct {
 
 		// Multiple NoSQL databases isn't uncommon.
 		// I.e. MongoDB as your regular DB + Redis for caching
-		NoSQL []NO_SQL_DB_TYPE `yaml:"no_sql"`
+		NoSQL struct {
+			Mongodb   bool `yaml:"mongodb"`
+			Redis     bool `yaml:"redis"`
+			Cassandra bool `yaml:"cassandra"`
+			Scylladb  bool `yaml:"scylladb"`
+		} `yaml:"no_sql"`
 	} `yaml:"db"`
 }
