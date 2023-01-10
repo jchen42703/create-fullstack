@@ -6,6 +6,7 @@ require (
 	github.com/MakeNowJust/heredoc/v2 v2.0.1
 	github.com/cli/cli/v2 v2.21.2
 	github.com/mitchellh/cli v1.1.5
+	github.com/otiai10/copy v1.9.0
 	github.com/spf13/cobra v1.6.1
 	go.uber.org/zap v1.24.0
 	gopkg.in/yaml.v2 v2.4.0
