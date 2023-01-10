@@ -41,6 +41,9 @@ jobs:
                   yarn -v
                   ls -l
 
+            - name: Yarn Cache
+              run: yarn cache list
+
             - name: Build
               run: go build -v ./...
 
