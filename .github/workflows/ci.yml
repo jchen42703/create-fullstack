@@ -41,8 +41,8 @@ jobs:
                   yarn -v
                   ls -l
 
-            - name: Yarn Cache
-              run: yarn cache list
+            - name: Nuke Yarn cache
+              run: rm -rf /home/runner/.cache/yarn
 
             - name: Build
               run: go build -v ./...
