@@ -43,7 +43,7 @@ jobs:
 
             - name: Debug script
               run: |
-                  yarn init
+                  yarn init -y
                   yarn add -D tailwindcss
 
             - name: Debug 2
