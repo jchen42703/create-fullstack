@@ -36,9 +36,6 @@ jobs:
                   #   current Node LTS
                   node-version: "18.13.0"
 
-            - name: Install yarn 1.22.17
-              run: npm i -g yarn@1.22.17
-
             - name: Debug
               run: |
                   yarn -v
