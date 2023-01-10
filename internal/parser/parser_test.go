@@ -69,4 +69,32 @@ func TestYamlToTemplateCfg(t *testing.T) {
 	if ui_config.UiCfg.AugmentOpts.AddCi != "git_workflows" {
 		t.Fatalf("Incorrect CI selection")
 	}
+
+	// yaml file where it only contains api key
+	api_config, err := parser.YamlToTemplateCfg("./test_files/backend_only.yaml")
+
+	if err != nil {
+		t.Fatalf("YamlToAugmentCfg failed with err: %s", err)
+	}
+
+	if api_config.ApiCfg.OutputDirectoryPath != "./fullstack_app_name/api" {
+		t.Fatalf("Incorrect output dir")
+	}
+
+	if api_config.ApiCfg.Base != "echo" {
+		t.Fatalf("Incorrect base")
+	}
+
+	if api_config.ApiCfg.Language != "go" {
+		t.Fatalf("Incorrect language")
+	}
+
+	if api_config.ApiCfg.Databases.SQL.DbType != "postgres" {
+		t.Fatalf("Database is not postgres")
+	}
+
+	if api_config.ApiCfg.Databases.SQL.StartupScript != "" {
+		t.Fatalf("startup script should be empty")
+	}
+
 }
