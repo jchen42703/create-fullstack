@@ -186,9 +186,35 @@ func (m *AugmentorPluginManager) WriteMetaToState() error {
   - `Load`
   - `String`
 
+## GRPC
+
+The way Terraform does it is by serving a `GRPCProviderPlugin`. This is analogous to the `KVGRPCPlugin` in the official GRPC tutorial.
+
+`GRPCProviderPlugin` uses the `GRPCClient`/`GRPCServer` methods to abstract GRPC interactions. The actual implementations come from the `ProviderClient` and `ProviderServer`.
+
+- This is similar to how in the tutorial, `GRPCClient` and `GRPCServer` actually implement the GRPC interactions.
+
 ## Resources
 
 - https://github.com/hashicorp/otto/blob/v0.2.0/command/plugin_manager.go
 - https://github.com/hleong25/hashicorp-goplugin-separate-binary-example/blob/4254a153a1fb412ab0ef80c08fb958f887a492c7/src/lahenry.com/mainapp/pluginmgr/pluginmgr.go#L17
 - https://github.com/hashicorp/go-plugin/issues/11
 - https://github.com/hashicorp/go-plugin/blob/main/examples/negotiated/main.go
+- **GRPC [Terraform]**
+  - https://github.com/hashicorp/terraform/blob/01b22f4b7688c9cf084214ef1dfe51ed7719fe42/internal/command/meta_providers.go
+  - ProviderClient (the main interface being implemented)
+    - https://github.com/hashicorp/terraform/blob/82f47ca9920f12b12ab4e53af5cc662dd34bb966/internal/tfplugin6/tfplugin6.pb.go
+  - https://github.com/hashicorp/terraform/blob/82f47ca9920f12b12ab4e53af5cc662dd34bb966/internal/plugin6/grpc_provider.go
+    - `GRPCProviderPlugin`
+      - Used in `VersionedPlugins` (map of plugins) which is used in the plugin serving
+    - `GRPCProvider`
+  - `ProviderServer` is in the [pb.go](https://github.com/hashicorp/terraform/blob/6fd3a8cdf47684c83cf36daa627ba7f7f5bf4f1b/internal/tfplugin6/tfplugin6.pb.go)
+- **GRPC [Example]**
+  - `GRPCClient`
+    - depends on proto-generated client
+    - Calls grpc req through proto client
+  - `GRPCServer`
+  - `KVGRPCPlugin`
+    - this is what is served (abstracts client and server interactions)
+  - The Actual Plugin Implementation
+    - `KV`
