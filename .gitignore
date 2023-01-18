@@ -24,5 +24,6 @@ profile.cov
 .env
 
 main
+aug
 create-fullstack
 *.log

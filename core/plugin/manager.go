@@ -1,21 +1,48 @@
 package plugin
 
-import "github.com/hashicorp/go-plugin"
+import (
+	"fmt"
+
+	"github.com/hashicorp/go-plugin"
+)
 
 // Manages the state of installed plugins and loads plugins.
 // Store generic plugin struct because we might have different plugin types in the future.
 // We only want each plugin manager to handle one type of interface.
 type PluginManager[T any] struct {
 	plugins map[string]*CfsPlugin[T]
+	// rawPlugins plugin.PluginSet
+}
+
+func (m *PluginManager[T]) AddPlugin(id string, pluginI *CfsPlugin[T]) error {
+	if m.plugins == nil {
+		return fmt.Errorf("must initialize plugins attribute first")
+	}
+
+	m.plugins[id] = pluginI
+	return nil
+}
+
+// Called by host.
+func (m *PluginManager[T]) InitializePlugin(id string, rawPlugin plugin.Plugin) error {
+	if m.plugins == nil {
+		return fmt.Errorf("must initialize plugins attribute first")
+	}
+
+	m.plugins[id] = &CfsPlugin[T]{
+		Plugin: rawPlugin,
+	}
+
+	return nil
 }
 
 // Gets all raw plugins. This is useful for specifying the plugins in plugin.ClientConfig.
-func (m *PluginManager[T]) Plugins() plugin.PluginSet {
-	plugins := plugin.PluginSet{}
-	for id, plugin := range m.plugins {
-		plugins[id] = plugin.Plugin
+func (m *PluginManager[T]) RawPlugins() plugin.PluginSet {
+	rawPlugins := make(plugin.PluginSet)
+	for id, cfsPlugin := range m.plugins {
+		rawPlugins[id] = cfsPlugin.Plugin
 	}
-	return plugins
+	return rawPlugins
 }
 
 // Gets all unused plugins. This is needed for detecting new augmentations (a.k.a. plugins are that not used yet.)
@@ -30,11 +57,21 @@ func (m *PluginManager[T]) GetUnusedPlugins() []*CfsPlugin[T] {
 	return unusedPlugins
 }
 
-// Loads a plugin from an executable.
-// Adds it to the PluginManager plugins map.
-func (m *PluginManager[T]) LoadPlugin(execPath string) (*CfsPlugin[T], error) {
-	return nil, nil
-}
+// // Loads a plugin from an executable.
+// // Adds it to the PluginManager plugins map.
+// func (m *PluginManager[T]) LoadPlugin(execPath string) (*CfsPlugin[T], error) {
+// 	loadedPlugin := &CfsPlugin[T]{
+// 		ExecPath: execPath,
+// 		Plugin:   &AugmentorPlugin{},
+// 	}
+
+// 	_, err := loadedPlugin.Load()
+// 	if err != nil {
+// 		return nil, fmt.Errorf("failed to load plugin: %s", err)
+// 	}
+
+// 	return loadedPlugin, nil
+// }
 
 // Loads all plugins in directory using the state config. Adds those plugins to the manager state.
 func (m *PluginManager[T]) LoadAllPlugins(pluginDir string) ([]*CfsPlugin[T], error) {

@@ -20,6 +20,18 @@ type AugmentorRpcClient struct {
 	client *rpc.Client
 }
 
+func (g *AugmentorRpcClient) Id() string {
+	var resp string
+	err := g.client.Call("Plugin.Id", new(interface{}), &resp)
+	if err != nil {
+		// You usually want your interfaces to return errors. If they don't,
+		// there isn't much other choice here.
+		panic(err)
+	}
+
+	return resp
+}
+
 func (g *AugmentorRpcClient) Augment() error {
 	err := g.client.Call("Plugin.Augment", new(interface{}), nil)
 	if err != nil {
@@ -38,7 +50,12 @@ type AugmentorRpcServer struct {
 	Impl aug.TemplateAugmentor
 }
 
-func (s *AugmentorRpcServer) Augment() error {
+func (s *AugmentorRpcServer) Id(args interface{}, resp *string) error {
+	*resp = s.Impl.Id()
+	return nil
+}
+
+func (s *AugmentorRpcServer) Augment(args interface{}, resp *string) error {
 	return s.Impl.Augment()
 }
 
@@ -56,6 +73,11 @@ func (p *AugmentorPlugin) Client(b *plugin.MuxBroker, c *rpc.Client) (interface{
 	return &AugmentorRpcClient{client: c}, nil
 }
 
-type AugmentorPluginManager struct {
-	PluginManager[aug.TemplateAugmentor]
+var AugmentorPluginManager = &PluginManager[aug.TemplateAugmentor]{
+	plugins: map[string]*CfsPlugin[aug.TemplateAugmentor]{},
 }
+
+// // pluginMap is the map of plugins we can dispense.
+// var PluginMap = map[string]plugin.Plugin{
+// 	"ExampleAugmentor": &AugmentorPlugin{},
+// }

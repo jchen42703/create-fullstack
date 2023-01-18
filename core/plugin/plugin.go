@@ -12,9 +12,9 @@ import (
 type CfsPlugin[T any] struct {
 	Plugin       plugin.Plugin
 	Meta         *PluginMeta
-	Used         bool
-	ExecPath     string // executable path
-	PluginClient *plugin.Client
+	Used         bool           // strictly for when we start using plugins with a pipeline
+	ExecPath     string         // executable path
+	PluginClient *plugin.Client // Set in CfsPlugin.Load
 }
 
 // Gets the plugin ID.
@@ -39,7 +39,8 @@ func (p *CfsPlugin[T]) Load() (T, error) {
 		Plugins:         plugins,
 		Cmd:             exec.Command(p.ExecPath),
 		AllowedProtocols: []plugin.Protocol{
-			plugin.ProtocolNetRPC, plugin.ProtocolGRPC},
+			plugin.ProtocolNetRPC,
+		},
 	})
 
 	p.PluginClient = client
