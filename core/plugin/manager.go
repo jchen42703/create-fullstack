@@ -11,19 +11,10 @@ import (
 // We only want each plugin manager to handle one type of interface.
 type PluginManager[T any] struct {
 	plugins map[string]*CfsPlugin[T]
-	// rawPlugins plugin.PluginSet
 }
 
-func (m *PluginManager[T]) AddPlugin(id string, pluginI *CfsPlugin[T]) error {
-	if m.plugins == nil {
-		return fmt.Errorf("must initialize plugins attribute first")
-	}
-
-	m.plugins[id] = pluginI
-	return nil
-}
-
-// Called by host.
+// Called by host to populate the host's plugin map with placeholder plugins that will be completed
+// by the plugins.
 func (m *PluginManager[T]) InitializePlugin(id string, rawPlugin plugin.Plugin) error {
 	if m.plugins == nil {
 		return fmt.Errorf("must initialize plugins attribute first")
@@ -36,7 +27,19 @@ func (m *PluginManager[T]) InitializePlugin(id string, rawPlugin plugin.Plugin) 
 	return nil
 }
 
-// Gets all raw plugins. This is useful for specifying the plugins in plugin.ClientConfig.
+// Adds a full plugin implementation to the manager. This should be called by the plugins to add a real
+// implementation of a plugin instead of having a placeholder.
+func (m *PluginManager[T]) AddPlugin(id string, pluginI *CfsPlugin[T]) error {
+	if m.plugins == nil {
+		return fmt.Errorf("must initialize plugins attribute first")
+	}
+
+	m.plugins[id] = pluginI
+	return nil
+}
+
+// Gets all raw plugins. This is useful for specifying the plugins in plugin.ClientConfig and
+// plugin.ServeConfig.
 func (m *PluginManager[T]) RawPlugins() plugin.PluginSet {
 	rawPlugins := make(plugin.PluginSet)
 	for id, cfsPlugin := range m.plugins {
