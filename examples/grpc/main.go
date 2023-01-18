@@ -27,7 +27,7 @@ func main() {
 		Logger:                logger.StandardWriter(&hclog.StandardLoggerOptions{}),
 	}
 
-	meta, err := installer.Install("./plugin", "./build")
+	meta, err := installer.Install("./plugin-go", "./build")
 	if err != nil {
 		logger.Error(err.Error())
 		return
@@ -43,7 +43,7 @@ func main() {
 		Cmd:             exec.Command(filepath.Join("build", meta.Id)),
 		Logger:          logger,
 		AllowedProtocols: []plugin.Protocol{
-			plugin.ProtocolNetRPC,
+			plugin.ProtocolGRPC,
 		},
 	})
 
