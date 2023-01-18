@@ -4,8 +4,6 @@ import (
 	"os"
 
 	"github.com/hashicorp/go-hclog"
-	"github.com/hashicorp/go-plugin"
-	"github.com/jchen42703/create-fullstack/core/aug"
 	cfsplugin "github.com/jchen42703/create-fullstack/core/plugin"
 )
 
@@ -33,19 +31,8 @@ func main() {
 		logger: logger,
 	}
 
-	execPath := "./plugin/aug"
-	addedPlugin := &cfsplugin.CfsPlugin[aug.TemplateAugmentor]{
-		ExecPath: execPath,
-		Plugin: &cfsplugin.AugmentorPlugin{
-			Impl: augmentor,
-		},
+	err := cfsplugin.ServeAugmentor(augmentor, logger)
+	if err != nil {
+		panic(err)
 	}
-
-	logger.Debug("message from plugin", augmentor.Id())
-	cfsplugin.AugmentorPluginManager.AddPlugin(augmentor.Id(), addedPlugin)
-	plugin.Serve(&plugin.ServeConfig{
-		HandshakeConfig: cfsplugin.AugmentPluginHandshake,
-		Plugins:         cfsplugin.AugmentorPluginManager.RawPlugins(),
-		Logger:          logger,
-	})
 }

@@ -20,11 +20,11 @@ func main() {
 		Level:  hclog.Debug,
 	})
 
-	cfsplugin.AugmentorPluginManager.InitializePlugin("ExampleAugmentor", &cfsplugin.AugmentorPlugin{})
+	cfsplugin.AugmentorManager.InitPlugin("ExampleAugmentor", &cfsplugin.AugmentorPlugin{})
 	// We're a host! Start by launching the plugin process.
 	client := plugin.NewClient(&plugin.ClientConfig{
 		HandshakeConfig: cfsplugin.AugmentPluginHandshake,
-		Plugins:         cfsplugin.AugmentorPluginManager.RawPlugins(),
+		Plugins:         cfsplugin.AugmentorManager.Plugins(),
 		Cmd:             exec.Command("./plugin/aug"),
 		Logger:          logger,
 		AllowedProtocols: []plugin.Protocol{

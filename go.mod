@@ -5,6 +5,7 @@ go 1.19
 require (
 	github.com/MakeNowJust/heredoc/v2 v2.0.1
 	github.com/cli/cli/v2 v2.21.2
+	github.com/hashicorp/go-hclog v0.14.1
 	github.com/hashicorp/go-plugin v1.4.8
 	github.com/mitchellh/cli v1.1.5
 	github.com/otiai10/copy v1.9.0
@@ -27,7 +28,6 @@ require (
 	github.com/google/shlex v0.0.0-20191202100458-e7afc7fbc510 // indirect
 	github.com/google/uuid v1.1.2 // indirect
 	github.com/hashicorp/errwrap v1.0.0 // indirect
-	github.com/hashicorp/go-hclog v0.14.1 // indirect
 	github.com/hashicorp/go-multierror v1.1.1 // indirect
 	github.com/hashicorp/yamux v0.0.0-20180604194846-3520598351bb // indirect
 	github.com/huandu/xstrings v1.3.2 // indirect

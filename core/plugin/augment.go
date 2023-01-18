@@ -73,11 +73,6 @@ func (p *AugmentorPlugin) Client(b *plugin.MuxBroker, c *rpc.Client) (interface{
 	return &AugmentorRpcClient{client: c}, nil
 }
 
-var AugmentorPluginManager = &PluginManager[aug.TemplateAugmentor]{
+var AugmentorManager = &PluginManager[aug.TemplateAugmentor]{
 	plugins: map[string]*CfsPlugin[aug.TemplateAugmentor]{},
 }
-
-// // pluginMap is the map of plugins we can dispense.
-// var PluginMap = map[string]plugin.Plugin{
-// 	"ExampleAugmentor": &AugmentorPlugin{},
-// }

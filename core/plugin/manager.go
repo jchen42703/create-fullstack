@@ -15,7 +15,7 @@ type PluginManager[T any] struct {
 
 // Called by host to populate the host's plugin map with placeholder plugins that will be completed
 // by the plugins.
-func (m *PluginManager[T]) InitializePlugin(id string, rawPlugin plugin.Plugin) error {
+func (m *PluginManager[T]) InitPlugin(id string, rawPlugin plugin.Plugin) error {
 	if m.plugins == nil {
 		return fmt.Errorf("must initialize plugins attribute first")
 	}
@@ -40,11 +40,12 @@ func (m *PluginManager[T]) AddPlugin(id string, pluginI *CfsPlugin[T]) error {
 
 // Gets all raw plugins. This is useful for specifying the plugins in plugin.ClientConfig and
 // plugin.ServeConfig.
-func (m *PluginManager[T]) RawPlugins() plugin.PluginSet {
+func (m *PluginManager[T]) Plugins() plugin.PluginSet {
 	rawPlugins := make(plugin.PluginSet)
 	for id, cfsPlugin := range m.plugins {
 		rawPlugins[id] = cfsPlugin.Plugin
 	}
+
 	return rawPlugins
 }
 
@@ -59,22 +60,6 @@ func (m *PluginManager[T]) GetUnusedPlugins() []*CfsPlugin[T] {
 
 	return unusedPlugins
 }
-
-// // Loads a plugin from an executable.
-// // Adds it to the PluginManager plugins map.
-// func (m *PluginManager[T]) LoadPlugin(execPath string) (*CfsPlugin[T], error) {
-// 	loadedPlugin := &CfsPlugin[T]{
-// 		ExecPath: execPath,
-// 		Plugin:   &AugmentorPlugin{},
-// 	}
-
-// 	_, err := loadedPlugin.Load()
-// 	if err != nil {
-// 		return nil, fmt.Errorf("failed to load plugin: %s", err)
-// 	}
-
-// 	return loadedPlugin, nil
-// }
 
 // Loads all plugins in directory using the state config. Adds those plugins to the manager state.
 func (m *PluginManager[T]) LoadAllPlugins(pluginDir string) ([]*CfsPlugin[T], error) {
