@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -41,7 +40,9 @@ func main() {
 		HandshakeConfig: cfsplugin.AugmentPluginHandshake,
 		Plugins:         cfsplugin.AugmentorManager.Plugins(),
 		Cmd:             exec.Command(filepath.Join("build", meta.Id)),
-		Logger:          logger,
+		// To run with Python, replace ^ with this line below:
+		// Cmd:    exec.Command("sh", "-c", "python ./plugin-python/plugin.py"),
+		Logger: logger,
 		AllowedProtocols: []plugin.Protocol{
 			plugin.ProtocolGRPC,
 		},
@@ -61,9 +62,11 @@ func main() {
 		logger.Error(err.Error())
 	}
 
-	// We should have a Greeter now! This feels like a normal interface
+	logger.Debug("Dispensed augmentor")
+
+	// We should have a TemplateAugmentor now! This feels like a normal interface
 	// implementation but is in fact over an RPC connection.
 	augmentor := raw.(aug.TemplateAugmentor)
-	fmt.Println(augmentor.Id())
-	fmt.Println(augmentor.Augment())
+	logger.Debug("Id", augmentor.Id())
+	logger.Debug("Augment", augmentor.Augment())
 }

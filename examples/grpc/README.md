@@ -10,10 +10,6 @@ Building and running the Go GRPC plugin:
 go build main.go && ./main
 ```
 
-<!-- ```
-$ export KV_PLUGIN="python plugin-python/plugin.py"
-``` -->
-
 ## Generating Proto Files
 
 For Go:
@@ -23,11 +19,12 @@ For Go:
 protoc -I=proto --go_out=. --go-grpc_out=. proto/aug.proto
 ```
 
-<!-- For Python:
+For Python:
 
 ```bash
-python -m grpc_tools.protoc -I ./proto/ --python_out=./plugin-python/ --grpc_python_out=./plugin-python/ ./proto/kv.proto
-``` -->
+# In this directory
+python -m grpc_tools.protoc -I ../../core/proto/ --python_out=./plugin-python/ --grpc_python_out=./plugin-python/ ../../core/proto/aug.proto
+```
 
 ## Key Points
 

@@ -29,3 +29,6 @@ aug
 create-fullstack
 *.log
 build
+
+# Python
+__pycache__
