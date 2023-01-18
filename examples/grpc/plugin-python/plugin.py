@@ -15,7 +15,7 @@ class TemplateAugmentor(aug_pb2_grpc.TemplateAugmentorServicer):
     """Implementation of TemplateAugmentorServicer."""
 
     def Id(self, request, context):
-        result = {"id": "ExampleAugmentor"}
+        result = {"id": "ExampleAugmentor2"}
         value = "Written from TemplateAugmentor.Id\n"
         with open("./create-fullstack.log", "w") as f:
             f.write(value + str(result))
