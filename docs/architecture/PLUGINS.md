@@ -186,6 +186,49 @@ func (m *AugmentorPluginManager) WriteMetaToState() error {
   - `Load`
   - `String`
 
+## Plugins [RPC] v2
+
+Currently, it's not clear the purpose of `PluginManager` is besides acting as an interface to a plugins maps.
+
+I want to inject some new responsibilities and clarify specific workflows.
+
+### Plugin Installation (CLI)
+
+Plugin installation should look like this:
+
+1. Download github repository.
+2. Run setup script.
+3. Move the built binary to `xxxx/plugins/`
+4. Write the plugin metadata to a shared JSON file.
+   1. Where do we get the metadata?
+   2. What is the metadata?
+
+The plugin repository is responsible for supplying a **augmentors_metadata.json**.
+
+```json
+[
+  {
+    "id": "ExampleAugmentors",
+    "version": "0.0.1",
+    "executableName": "example_aug",
+    "installLink": "CLI_WRITES_THIS"
+  }
+]
+```
+
+### Host
+
+The host is responsible for:
+
+1. Discovering all plugins by reading plugin metadata.
+2. Then, the host must initialize the plugin map with all of the read plugins.
+3. Then, the host initializes the plugin client.
+4. Using the plugin client, the host can then dispense interface implementations as they please.
+
+## Plugins
+
+To be honest, we can likely completely abstract the whole plugin creation and serving process. The only thing that really needs to be customized is the struct that implements the desired interface.
+
 ## GRPC
 
 The way Terraform does it is by serving a `GRPCProviderPlugin`. This is analogous to the `KVGRPCPlugin` in the official GRPC tutorial.
