@@ -3,7 +3,7 @@
 ## Getting Started
 
 ```bash
-go build -o ./plugin/aug ./plugin/aug.go && go build main.go && ./main
+go build main.go && ./main
 ```
 
 ## Key Points

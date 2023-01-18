@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 	"os/exec"
+	"path/filepath"
 
 	"github.com/hashicorp/go-hclog"
 	"github.com/hashicorp/go-plugin"
@@ -20,12 +21,26 @@ func main() {
 		Level:  hclog.Debug,
 	})
 
+	// Install plugin prior to running
+	installer := cfsplugin.AugmentorPluginInstaller{
+		ParentOutputPluginDir: "./build",
+		Logger:                logger.StandardWriter(&hclog.StandardLoggerOptions{}),
+	}
+
+	meta, err := installer.Install("./plugin", "./build")
+	if err != nil {
+		logger.Error(err.Error())
+		return
+	}
+
+	logger.Debug("meta", meta)
+
 	cfsplugin.AugmentorManager.InitPlugin("ExampleAugmentor", &cfsplugin.AugmentorPlugin{})
 	// We're a host! Start by launching the plugin process.
 	client := plugin.NewClient(&plugin.ClientConfig{
 		HandshakeConfig: cfsplugin.AugmentPluginHandshake,
 		Plugins:         cfsplugin.AugmentorManager.Plugins(),
-		Cmd:             exec.Command("./plugin/aug"),
+		Cmd:             exec.Command(filepath.Join("build", meta.Id)),
 		Logger:          logger,
 		AllowedProtocols: []plugin.Protocol{
 			plugin.ProtocolNetRPC,

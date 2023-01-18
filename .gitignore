@@ -23,7 +23,9 @@ profile.cov
 # Just in-case
 .env
 
+# Build artifacts
 main
 aug
 create-fullstack
 *.log
+build
