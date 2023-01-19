@@ -1,5 +1,6 @@
 {
 	"pluginId": "jchen42703-ExampleAugmentor-go",
 	"version": "0.0.1",
-	"installLink": "n/a"
+	"installLink": "n/a",
+	"entrypoint": "main.go"
 }
