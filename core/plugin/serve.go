@@ -6,6 +6,7 @@ import (
 	"github.com/jchen42703/create-fullstack/core/aug"
 )
 
+// Called by a Go plugin to serve an implementation of aug.TemplateAugmentor.
 func ServeAugmentor(augmentor aug.TemplateAugmentor, hcLogger hclog.Logger) error {
 	addedPlugin := &CfsPlugin[aug.TemplateAugmentor]{
 		Plugin: &AugmentorPlugin{
@@ -22,6 +23,8 @@ func ServeAugmentor(augmentor aug.TemplateAugmentor, hcLogger hclog.Logger) erro
 		HandshakeConfig: AugmentPluginHandshake,
 		Plugins:         AugmentorManager.Plugins(),
 		Logger:          hcLogger,
+		// A non-nil value here enables gRPC serving for this plugin...
+		GRPCServer: plugin.DefaultGRPCServer,
 	})
 
 	return nil
