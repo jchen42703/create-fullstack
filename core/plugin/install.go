@@ -9,6 +9,7 @@ import (
 	"path/filepath"
 
 	cp "github.com/otiai10/copy"
+	"go.uber.org/zap"
 
 	"github.com/jchen42703/create-fullstack/core/run"
 )
@@ -34,7 +35,48 @@ import (
 //			...
 type AugmentorPluginInstaller struct {
 	ParentOutputPluginDir string
-	Logger                io.Writer
+
+	// Separating because the logger != writer
+	// i.e. when running plugins, the logger will not be a zap logger.
+	// Uses hclog
+	Writer io.Writer
+	Logger *zap.Logger
+}
+
+// Gets all installed plugins. It assumes that all plugins with a valid PluginMeta json file.
+func (i *AugmentorPluginInstaller) GetAllPlugins() ([]*PluginMeta, error) {
+	dirs, err := os.ReadDir(i.ParentOutputPluginDir)
+	if err != nil {
+		return nil, err
+	}
+
+	allMeta := []*PluginMeta{}
+	for _, pluginDir := range dirs {
+		// Ignore not directories
+		if !pluginDir.IsDir() {
+			continue
+		}
+
+		// Check if it has a metadata JSON
+		f, err := os.ReadFile(filepath.Join(i.ParentOutputPluginDir, pluginDir.Name(), "augmentor_metadata.json"))
+		if err != nil {
+			// Log this
+			i.Logger.Debug(fmt.Sprintf("SKIPPING plugin %s: is missing augmentor_metadata.json", pluginDir.Name()))
+			continue
+		}
+
+		var metadata PluginMeta
+		err = json.Unmarshal(f, &metadata)
+		if err != nil {
+			i.Logger.Debug(fmt.Sprintf("failed to parse augmentor_metadata.json for plugin %s", pluginDir.Name()))
+			continue
+		}
+
+		// Is valid, so add to slice
+		allMeta = append(allMeta, &metadata)
+	}
+
+	return allMeta, nil
 }
 
 // This function installs a single Go RPC Plugin.
@@ -68,7 +110,8 @@ func (i *AugmentorPluginInstaller) Install(pluginDir string, outputPluginDir str
 	// Build plugin executable to the output directory.
 	outputExecPath := filepath.Join(outputPluginDir, metadata.Id)
 	cmd := exec.Command("go", "build", "-o", outputExecPath, pluginDir)
-	err = run.Cmd(cmd, i.Logger)
+	err = run.Cmd(cmd, i.Writer)
+
 	if err != nil {
 		return nil, fmt.Errorf("plugin build failed: %s", err)
 	}
