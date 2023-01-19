@@ -8,6 +8,7 @@ import (
 	"github.com/jchen42703/create-fullstack/cmd/augment"
 	"github.com/jchen42703/create-fullstack/cmd/context"
 	genCmd "github.com/jchen42703/create-fullstack/cmd/gen"
+	"github.com/jchen42703/create-fullstack/cmd/plugins"
 	versionCmd "github.com/jchen42703/create-fullstack/cmd/version"
 	"github.com/spf13/cobra"
 )
@@ -56,7 +57,9 @@ func NewCmdRoot(cmdCtx *context.CmdContext) *cobra.Command {
 		ID:    "core",
 		Title: "Core Commands",
 	})
+
 	cmd.AddCommand(augment.NewCmd())
+	cmd.AddCommand(plugins.NewCmd())
 	cmd.AddCommand(genCmd.NewCmd(cmdCtx))
 
 	return cmd
