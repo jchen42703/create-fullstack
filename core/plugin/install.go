@@ -79,6 +79,53 @@ func (i *AugmentorPluginInstaller) GetAllPlugins() ([]*PluginMeta, error) {
 	return allMeta, nil
 }
 
+// Useful if the entrypoint requires you to build the file.
+func (i *AugmentorPluginInstaller) getBuildCommand(entrypoint string, outputExecPath string, pluginDir string) *exec.Cmd {
+	extension := filepath.Ext(entrypoint)
+
+	switch extension {
+	case "go":
+		return exec.Command("go", "build", "-o", outputExecPath, pluginDir)
+	case "python":
+		return nil
+	default:
+		return nil
+	}
+}
+
+// Creates the command for running the plugin.
+// `entrypoint` is not exactly the Entrypoint from PluginMeta. It is the full path to entrypoint.
+// `execPath` should only be set if a language requires an executable to run the plugin.
+//
+// Usage [Go]:
+//
+//	i.GetRunCmd("main.go", "./build/jchen42703/Example-Augmentor-go")
+//
+// Usage [Python]: (No Build)
+//
+//	i.GetRunCmd("./plugin-python/plugin.py", "")
+func (i *AugmentorPluginInstaller) GetRunCmd(entrypointPath string, execPath string) (*exec.Cmd, error) {
+	extension := filepath.Ext(entrypointPath)
+	absEntrypoint, err := filepath.Abs(entrypointPath)
+	if err != nil {
+		return nil, err
+	}
+
+	switch extension {
+	case "go":
+		absExec, err := filepath.Abs(execPath)
+		if err != nil {
+			return nil, fmt.Errorf("failed convert exec path to abs path: %s", err)
+		}
+
+		return exec.Command(absExec), nil
+	case "py":
+		return exec.Command("python", absEntrypoint), nil
+	default:
+		return nil, fmt.Errorf("unsupported language extension: %s", extension)
+	}
+}
+
 // This function installs a single Go RPC Plugin.
 // CFS expects the pluginDir to lead to a directory that looks like:
 //
@@ -109,11 +156,13 @@ func (i *AugmentorPluginInstaller) Install(pluginDir string, outputPluginDir str
 
 	// Build plugin executable to the output directory.
 	outputExecPath := filepath.Join(outputPluginDir, metadata.Id)
-	cmd := exec.Command("go", "build", "-o", outputExecPath, pluginDir)
-	err = run.Cmd(cmd, i.Writer)
+	cmd := i.getBuildCommand(metadata.Entrypoint, outputExecPath, pluginDir)
+	if cmd != nil {
+		err = run.Cmd(cmd, i.Writer)
 
-	if err != nil {
-		return nil, fmt.Errorf("plugin build failed: %s", err)
+		if err != nil {
+			return nil, fmt.Errorf("plugin build failed: %s", err)
+		}
 	}
 
 	err = cp.Copy(metadataPath, filepath.Join(outputPluginDir, augMetadataName))
