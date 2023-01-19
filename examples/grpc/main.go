@@ -10,7 +10,6 @@ import (
 	"github.com/hashicorp/go-plugin"
 	"github.com/jchen42703/create-fullstack/core/aug"
 	cfsplugin "github.com/jchen42703/create-fullstack/core/plugin"
-	"github.com/jchen42703/create-fullstack/internal/log"
 )
 
 func runExampleAugmentor(pluginId string, logger hclog.Logger, cmd *exec.Cmd) error {
@@ -50,26 +49,44 @@ func runExampleAugmentor(pluginId string, logger hclog.Logger, cmd *exec.Cmd) er
 	return nil
 }
 
-func installGoPlugin(logger hclog.Logger) (*cfsplugin.PluginMeta, error) {
-	// Install plugin prior to running
-	installerLogger, err := log.CreateLogger("./build/create-fullstack.log")
+func runPlugins(parentPluginDir string, logger hclog.Logger) error {
+	installer, err := cfsplugin.NewAugmentorPluginInstaller(parentPluginDir, logger)
 	if err != nil {
-		return nil, fmt.Errorf("failed to create logger: %s", err)
+		return fmt.Errorf("failed to create augmentor plugin installer: %s", err)
 	}
 
-	installer := cfsplugin.AugmentorPluginInstaller{
-		ParentOutputPluginDir: "./build",
-		Writer:                logger.StandardWriter(&hclog.StandardLoggerOptions{}),
-		Logger:                installerLogger,
-	}
-
-	meta, err := installer.Install("./plugin-go", "./build")
+	// Copying plugins to the parent plugin dir
+	// TODO: example with github link.
+	err = installer.GetPlugin("./plugin-go")
 	if err != nil {
-		return nil, fmt.Errorf("failed to install go grpc plugin: %s", err)
+		return fmt.Errorf("failed to get plugin-go: %s", err)
 	}
 
-	logger.Debug("meta", meta)
-	return meta, nil
+	err = installer.GetPlugin("./plugin-python")
+	if err != nil {
+		return fmt.Errorf("failed to get plugin-python: %s", err)
+	}
+
+	// Install all plugins.
+	metas, err := installer.InstallAll()
+	if err != nil {
+		return fmt.Errorf("failed to install plugins: %s", err)
+	}
+
+	for _, meta := range metas {
+		metaPluginDir := filepath.Join(parentPluginDir, meta.Id)
+		runCmd, err := installer.GetRunCmd(filepath.Join(metaPluginDir, meta.Entrypoint), filepath.Join(metaPluginDir, meta.Id))
+		if err != nil {
+			return fmt.Errorf("failed to get run cmd: %s", err)
+		}
+
+		err = runExampleAugmentor(meta.Id, logger, runCmd)
+		if err != nil {
+			return fmt.Errorf("failed to run grpc plugin: %s", err)
+		}
+	}
+
+	return nil
 }
 
 // Runs the plugins
@@ -81,22 +98,16 @@ func main() {
 		Level:  hclog.Debug,
 	})
 
-	// Go GRPC
-	goMeta, err := installGoPlugin(logger)
-	if err != nil {
-		logger.Error(err.Error())
-		return
-	}
+	pluginInstallDir := "./plugins"
+	defer func() {
+		err := os.RemoveAll(pluginInstallDir)
+		if err != nil {
+			logger.Error("failed to cleanup plugins dir")
+		}
+	}()
 
-	err = runExampleAugmentor(goMeta.Id, logger, exec.Command(filepath.Join("build", goMeta.Id)))
+	err := runPlugins(pluginInstallDir, logger)
 	if err != nil {
-		logger.Error(fmt.Sprintf("failed to run go grpc plugin: %s", err))
-	}
-
-	// TODO: Should read from python meta.
-	pythonMetaId := "jchen42703-ExampleAugmentor-python"
-	err = runExampleAugmentor(pythonMetaId, logger, exec.Command("python", "./plugin-python/plugin.py"))
-	if err != nil {
-		logger.Error(fmt.Sprintf("failed to run python grpc plugin: %s", err))
+		logger.Debug(fmt.Sprintf("failed to run plugin: %s", err))
 	}
 }

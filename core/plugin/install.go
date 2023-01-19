@@ -7,11 +7,15 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
+	"strings"
 
+	"github.com/hashicorp/go-hclog"
 	cp "github.com/otiai10/copy"
 	"go.uber.org/zap"
 
 	"github.com/jchen42703/create-fullstack/core/run"
+	"github.com/jchen42703/create-fullstack/internal/directory"
+	"github.com/jchen42703/create-fullstack/internal/log"
 )
 
 // Abstracting the plugin installation process.
@@ -41,6 +45,85 @@ type AugmentorPluginInstaller struct {
 	// Uses hclog
 	Writer io.Writer
 	Logger *zap.Logger
+}
+
+func NewAugmentorPluginInstaller(parentPluginDir string, pluginLogger hclog.Logger) (*AugmentorPluginInstaller, error) {
+	err := os.MkdirAll(parentPluginDir, directory.READ_WRITE_EXEC_PERM)
+	if err != nil {
+		return nil, fmt.Errorf("failed to create parent plugin dir %s: %s", parentPluginDir, err)
+	}
+
+	// Install plugin prior to running
+	logFilepath := filepath.Join(parentPluginDir, "create-fullstack-plugin-installer.log")
+	installerLogger, err := log.CreateLogger(logFilepath)
+	if err != nil {
+		return nil, fmt.Errorf("failed to create logger: %s", err)
+	}
+
+	installer := &AugmentorPluginInstaller{
+		ParentOutputPluginDir: parentPluginDir,
+		Writer:                pluginLogger.StandardWriter(&hclog.StandardLoggerOptions{}),
+		Logger:                installerLogger,
+	}
+
+	return installer, nil
+}
+
+// Reads the plugin metadata.
+func (i *AugmentorPluginInstaller) ReadMetadata(pluginDir string) (*PluginMeta, error) {
+	// Reads the plugin metadata
+	augMetadataName := "augmentor_metadata.json"
+	metadataPath := filepath.Join(pluginDir, augMetadataName)
+	f, err := os.ReadFile(metadataPath)
+	if err != nil {
+		return nil, fmt.Errorf("failed to read metadata: %s", err)
+	}
+
+	var metadata PluginMeta
+	err = json.Unmarshal(f, &metadata)
+	if err != nil {
+		return nil, fmt.Errorf("failed to parse metadata: %s", err)
+	}
+
+	return &metadata, nil
+}
+
+func (i *AugmentorPluginInstaller) GetPlugin(pluginUri string) error {
+	// Is url?
+	isUrl := false
+	if isUrl {
+		// Download it into i.ParentOutputPluginDir
+		return nil
+	}
+
+	isDir, err := directory.Exists(pluginUri)
+	if err != nil {
+		return fmt.Errorf("failed to determine if %s exists: %s", pluginUri, err)
+	}
+
+	if isDir {
+		metadata, err := i.ReadMetadata(pluginUri)
+		if err != nil {
+			return fmt.Errorf("failed to read metadata: %s", err)
+		}
+
+		// Doesn't copy symlinks (bugged)
+		opts := cp.Options{
+			OnSymlink: func(src string) cp.SymlinkAction {
+				return cp.Skip
+			},
+		}
+		// Is directory?
+		// Copy it into i.ParentOutputPluginDir
+		err = cp.Copy(pluginUri, filepath.Join(i.ParentOutputPluginDir, metadata.Id), opts)
+		if err != nil {
+			return fmt.Errorf("failed to copy %s to plugin dir %s: %s", pluginUri, i.ParentOutputPluginDir, err)
+		}
+
+		return nil
+	}
+
+	return fmt.Errorf("cannot determine fetch method for plugin %s", pluginUri)
 }
 
 // Gets all installed plugins. It assumes that all plugins with a valid PluginMeta json file.
@@ -81,7 +164,7 @@ func (i *AugmentorPluginInstaller) GetAllPlugins() ([]*PluginMeta, error) {
 
 // Useful if the entrypoint requires you to build the file.
 func (i *AugmentorPluginInstaller) getBuildCommand(entrypoint string, outputExecPath string, pluginDir string) *exec.Cmd {
-	extension := filepath.Ext(entrypoint)
+	extension := strings.TrimPrefix(filepath.Ext(entrypoint), ".")
 
 	switch extension {
 	case "go":
@@ -105,7 +188,7 @@ func (i *AugmentorPluginInstaller) getBuildCommand(entrypoint string, outputExec
 //
 //	i.GetRunCmd("./plugin-python/plugin.py", "")
 func (i *AugmentorPluginInstaller) GetRunCmd(entrypointPath string, execPath string) (*exec.Cmd, error) {
-	extension := filepath.Ext(entrypointPath)
+	extension := strings.TrimPrefix(filepath.Ext(entrypointPath), ".")
 	absEntrypoint, err := filepath.Abs(entrypointPath)
 	if err != nil {
 		return nil, err
@@ -139,24 +222,20 @@ func (i *AugmentorPluginInstaller) GetRunCmd(entrypointPath string, execPath str
 // 1. Builds the plugin.
 // 2. Validates the metadata.
 // 3. Moves the built executable and metadata into the output plugin directory.
-func (i *AugmentorPluginInstaller) Install(pluginDir string, outputPluginDir string) (*PluginMeta, error) {
-	// Reads the plugin metadata
-	augMetadataName := "augmentor_metadata.json"
-	metadataPath := filepath.Join(pluginDir, augMetadataName)
-	f, err := os.ReadFile(metadataPath)
+func (i *AugmentorPluginInstaller) Install(pluginDir string) (*PluginMeta, error) {
+	metadata, err := i.ReadMetadata(pluginDir)
 	if err != nil {
-		return nil, fmt.Errorf("failed to read metadata: %s", err)
-	}
-
-	var metadata PluginMeta
-	err = json.Unmarshal(f, &metadata)
-	if err != nil {
-		return nil, fmt.Errorf("failed to parse metadata: %s", err)
+		return nil, fmt.Errorf("failed to read plugin meta: %s", err)
 	}
 
 	// Build plugin executable to the output directory.
-	outputExecPath := filepath.Join(outputPluginDir, metadata.Id)
-	cmd := i.getBuildCommand(metadata.Entrypoint, outputExecPath, pluginDir)
+	pluginInstallDir, err := filepath.Abs(pluginDir)
+	if err != nil {
+		return nil, fmt.Errorf("filepath.Abs: %s", pluginInstallDir)
+	}
+
+	outputExecPath := filepath.Join(pluginInstallDir, metadata.Id)
+	cmd := i.getBuildCommand(metadata.Entrypoint, outputExecPath, pluginInstallDir)
 	if cmd != nil {
 		err = run.Cmd(cmd, i.Writer)
 
@@ -165,10 +244,27 @@ func (i *AugmentorPluginInstaller) Install(pluginDir string, outputPluginDir str
 		}
 	}
 
-	err = cp.Copy(metadataPath, filepath.Join(outputPluginDir, augMetadataName))
+	return metadata, nil
+}
+
+// Use this when you want to install multiple plugins in a directory.
+// parentPluginDir
+//
+//	plugin1
+//	plugin2
+func (i *AugmentorPluginInstaller) InstallAll() ([]*PluginMeta, error) {
+	pluginMetas, err := i.GetAllPlugins()
 	if err != nil {
-		return nil, fmt.Errorf("failed to copy metadata: %s", err)
+		return nil, fmt.Errorf("failed get all plugins: %s", err)
 	}
 
-	return &metadata, nil
+	for _, meta := range pluginMetas {
+		pluginDir := filepath.Join(i.ParentOutputPluginDir, meta.Id)
+		_, err := i.Install(pluginDir)
+		if err != nil {
+			return nil, fmt.Errorf("failed to install plugin %s: %s", meta.Id, err)
+		}
+	}
+
+	return pluginMetas, nil
 }
