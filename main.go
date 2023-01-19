@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 	"strings"
+	"time"
 
 	"github.com/cli/cli/v2/pkg/iostreams"
 	"github.com/jchen42703/create-fullstack/cmd/context"
@@ -56,9 +57,10 @@ func runMain() exitCode {
 
 	// TODO: set the pager command for making viewing logs cleaner.
 	io := iostreams.System()
+	currentTime := time.Now()
 	cmdCtx := &context.CmdContext{
 		Version:        "0.0.0-dev",
-		BuildDate:      "2023-01-05",
+		BuildDate:      currentTime.Format("2006-01-02"),
 		IoStreams:      io,
 		ExecutableName: executable.GetPath("create-fullstack"),
 		Logger:         logger,
