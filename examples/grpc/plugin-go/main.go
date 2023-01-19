@@ -12,11 +12,11 @@ type ExampleAugmentor struct {
 }
 
 func (a *ExampleAugmentor) Id() string {
-	return "ExampleAugmentor"
+	return "jchen42703-ExampleAugmentor-go"
 }
 
 func (a *ExampleAugmentor) Augment() error {
-	a.logger.Debug("message from ExampleAugmentor.Augment")
+	a.logger.Debug("message from jchen42703-ExampleAugmentor-go.Augment")
 	return nil
 }
 

@@ -15,14 +15,14 @@ class TemplateAugmentor(aug_pb2_grpc.TemplateAugmentorServicer):
     """Implementation of TemplateAugmentorServicer."""
 
     def Id(self, request, context):
-        result = {"id": "ExampleAugmentor2"}
-        value = "Written from TemplateAugmentor.Id\n"
+        result = {"id": "jchen42703-ExampleAugmentor-python"}
+        value = "Written from jchen42703-ExampleAugmentor-python.Id\n"
         with open("./create-fullstack.log", "w") as f:
             f.write(value + str(result))
         return aug_pb2.IdResponse(**result)
 
     def Augment(self, request, context):
-        value = "\n\nWritten from TemplateAugmentor.Augment"
+        value = "\n\nWritten from jchen42703-ExampleAugmentor-python.Augment"
         with open("./create-fullstack.log", "w") as f:
             f.write(value)
         return aug_pb2.Empty()
