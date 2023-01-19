@@ -14,4 +14,6 @@ type CmdContext struct {
 	Version        string
 	BuildDate      string
 	ExecutableName string
+
+	GlobalPluginsDir string // the parent dir storing all plugins directories
 }

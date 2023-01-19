@@ -59,7 +59,7 @@ func NewCmdRoot(cmdCtx *context.CmdContext) *cobra.Command {
 	})
 
 	cmd.AddCommand(augment.NewCmd())
-	cmd.AddCommand(plugins.NewCmd())
+	cmd.AddCommand(plugins.NewCmd(cmdCtx))
 	cmd.AddCommand(genCmd.NewCmd(cmdCtx))
 
 	return cmd

@@ -2,12 +2,21 @@ package plugins
 
 import (
 	"fmt"
+	"os"
 
+	"github.com/jchen42703/create-fullstack/cmd/context"
+	"github.com/jchen42703/create-fullstack/internal/directory"
 	"github.com/spf13/cobra"
 )
 
 // Creates the `plugins` command with the appropriate subcommands.
-func NewCmd() *cobra.Command {
+func NewCmd(cmdCtx *context.CmdContext) *cobra.Command {
+	err := os.MkdirAll(cmdCtx.GlobalPluginsDir, directory.READ_WRITE_EXEC_PERM)
+	if err != nil {
+		// Idk what to do here
+		panic(fmt.Errorf("failed to create global plugins dir %s: %s", cmdCtx.GlobalPluginsDir, err))
+	}
+
 	pluginsCmd := &cobra.Command{
 		Use:     "plugins",
 		GroupID: "core",
@@ -22,7 +31,7 @@ func NewCmd() *cobra.Command {
 		Title: "Plugins Commands",
 	})
 
-	pluginsCmd.AddCommand(NewListCmd())
+	pluginsCmd.AddCommand(NewListCmd(cmdCtx))
 
 	return pluginsCmd
 }

@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"os"
+	"runtime"
 	"strings"
 	"time"
 
@@ -59,11 +60,12 @@ func runMain() exitCode {
 	io := iostreams.System()
 	currentTime := time.Now()
 	cmdCtx := &context.CmdContext{
-		Version:        "0.0.0-dev",
-		BuildDate:      currentTime.Format("2006-01-02"),
-		IoStreams:      io,
-		ExecutableName: executable.GetPath("create-fullstack"),
-		Logger:         logger,
+		Version:          "0.0.0-dev",
+		BuildDate:        currentTime.Format("2006-01-02"),
+		IoStreams:        io,
+		ExecutableName:   executable.GetPath("create-fullstack"),
+		Logger:           logger,
+		GlobalPluginsDir: context.GetGlobalPluginsDir(runtime.GOOS),
 	}
 
 	defer func() {
