@@ -28,20 +28,19 @@ func NewListCmd(cmdCtx *context.CmdContext) *cobra.Command {
 				return fmt.Errorf("failed to initialize plugin installer: %s", err)
 			}
 
-			cs := cmdCtx.IoStreams.ColorScheme()
 			allPlugins, err := installer.GetAllPlugins()
 			if err != nil {
 				return fmt.Errorf("failed to view all installed plugins: %s", err)
 			}
 
 			if len(allPlugins) == 0 {
-				fmt.Fprint(os.Stdout, cs.Yellowf("No installed plugins found in the plugin directory '%s'.\nPlease run `create-fullstack plugins install <YOUR_PLUGIN_URL>` to install plugins.\n", cmdCtx.GlobalPluginsDir))
+				cmdCtx.CliUi.Warnf("No installed plugins found in the plugin directory '%s'.\nPlease run `create-fullstack plugins install <YOUR_PLUGIN_URL>` to install plugins.\n", cmdCtx.GlobalPluginsDir)
 				return nil
 			}
 
-			fmt.Fprint(os.Stdout, cs.Bold("All Installed Plugins:\n"))
+			cmdCtx.CliUi.Bold("All Installed Plugins:\n")
 			for _, plugin := range allPlugins {
-				fmt.Fprint(os.Stdout, cs.Grayf("%s [%s]\n", plugin.Id, plugin.Version))
+				cmdCtx.CliUi.Grayf("%s [%s]\n", plugin.Id, plugin.Version)
 			}
 
 			return nil

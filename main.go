@@ -2,13 +2,12 @@ package main
 
 import (
 	"errors"
-	"fmt"
 	"os"
 	"runtime"
 	"strings"
 	"time"
 
-	"github.com/cli/cli/v2/pkg/iostreams"
+	"github.com/jchen42703/create-fullstack/cmd/cliui"
 	"github.com/jchen42703/create-fullstack/cmd/context"
 	"github.com/jchen42703/create-fullstack/cmd/root"
 	"github.com/jchen42703/create-fullstack/internal/executable"
@@ -34,15 +33,14 @@ func main() {
 // https://github.com/cli/cli/blob/trunk/cmd/gh/main.go
 func runMain() exitCode {
 	// TODO: Check for CLI updates
-	ioStreams := iostreams.System()
-	cs := ioStreams.ColorScheme()
+	cliUi := cliui.NewColorUi()
 
 	// TODO: dynamically get the log file path for different OSes
 	logFilePath := "./create-fullstack.log"
 	// Initialize logger. Uses CFS_LOG_LVL env var to determine the log level.
 	logger, err := log.CreateLogger(logFilePath)
 	if err != nil {
-		fmt.Fprint(os.Stderr, cs.Redf("Error initializing logger: %s", err.Error()))
+		cliUi.Errorf("Error initializing logger: %s", err.Error())
 		return exitError
 	}
 
@@ -51,7 +49,7 @@ func runMain() exitCode {
 	cmdCtx := &context.CmdContext{
 		Version:          "0.0.0-dev",
 		BuildDate:        currentTime.Format("2006-01-02"),
-		IoStreams:        ioStreams,
+		CliUi:            cliUi,
 		ExecutableName:   executable.GetPath("create-fullstack"),
 		Logger:           logger,
 		GlobalPluginsDir: context.GetGlobalPluginsDir(runtime.GOOS),
@@ -61,7 +59,7 @@ func runMain() exitCode {
 		if err := logger.Sync(); err != nil {
 			// this sync error is safe to ignore, since stdout doesn't support syncing in Linux/OS X
 			if !strings.HasSuffix(err.Error(), "sync /dev/stdout: invalid argument") {
-				fmt.Fprint(os.Stderr, cs.Redf("Error cleaning up logger: %s", err.Error()))
+				cliUi.Errorf("Error cleaning up logger: %s", err.Error())
 			}
 		}
 	}()
@@ -84,15 +82,15 @@ func runMain() exitCode {
 	rootCmd := root.NewCmdRoot(cmdCtx)
 	// Only prints usage for flag errors
 	rootCmd.SetFlagErrorFunc(func(cmd *cobra.Command, err error) error {
-		fmt.Fprintln(os.Stderr, cs.Red(err.Error()))
-		cmd.Println("\n" + cmd.UsageString())
+		cliUi.Error(err.Error() + "\n")
+		cliUi.Log("\n" + cmd.UsageString())
 		return SilentErr
 	})
 
 	err = rootCmd.Execute()
 	if err != nil {
 		if err != SilentErr {
-			fmt.Fprint(os.Stderr, cs.Redf("Failed to execute command: %s\n", err.Error()))
+			cliUi.Errorf("Failed to execute command: %s\n", err.Error())
 		}
 
 		return exitError

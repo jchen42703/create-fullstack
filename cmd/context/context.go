@@ -1,15 +1,14 @@
 package context
 
 import (
-	"github.com/cli/cli/v2/pkg/iostreams"
+	"github.com/jchen42703/create-fullstack/cmd/cliui"
 	"go.uber.org/zap"
 )
 
 // Contains the shared parameters that all commands need access to.
 type CmdContext struct {
 	Logger *zap.Logger
-	// TODO: Include Survey Prompter
-	IoStreams *iostreams.IOStreams
+	CliUi  *cliui.ColorUi
 
 	Version        string
 	BuildDate      string
