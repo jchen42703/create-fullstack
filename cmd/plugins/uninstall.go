@@ -44,7 +44,8 @@ func NewUninstallCmd(cmdCtx *context.CmdContext) *cobra.Command {
 				cmdCtx.CliUi.Successf("Successfully uninstalled plugin [%s]\n", pluginId)
 			}
 
-			cmdCtx.CliUi.Successf("\nSuccessfully uninstalled %d plugins\n", len(idsToUninstall))
+			cmdCtx.CliUi.Log("\n")
+			cmdCtx.CliUi.Successf("Successfully uninstalled %d plugins\n", len(idsToUninstall))
 
 			return nil
 		},
