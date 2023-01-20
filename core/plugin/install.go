@@ -268,3 +268,40 @@ func (i *AugmentorPluginInstaller) InstallAll() ([]*PluginMeta, error) {
 
 	return pluginMetas, nil
 }
+
+// Uninstalls a plugin by deleting the plugin directory from the parent plugin directory
+// i.e.
+//
+//	ParentOutputPluginDir
+//		plugin1
+//		plugin2
+//
+// Result from uninstalling `plugin1`:
+//
+//	ParentOutputPluginDir
+//		plugin2
+func (i *AugmentorPluginInstaller) Uninstall(pluginId string) error {
+	// Check if is valid pluginId
+	pluginMetas, err := i.GetAllPlugins()
+	if err != nil {
+		return fmt.Errorf("GetAllPlugins: %s", err)
+	}
+
+	pluginExists := false
+	for _, meta := range pluginMetas {
+		if meta.Id == pluginId {
+			pluginExists = true
+		}
+	}
+
+	if !pluginExists {
+		return fmt.Errorf("plugin not found")
+	}
+
+	// Uninstall by deleting the plugin from the parent plugin directory.
+	if err := os.RemoveAll(filepath.Join(i.ParentOutputPluginDir, pluginId)); err != nil {
+		return fmt.Errorf("failed to uninstall plugin %s: %s", pluginId, err)
+	}
+
+	return nil
+}
