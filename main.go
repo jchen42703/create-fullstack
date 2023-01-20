@@ -12,7 +12,6 @@ import (
 	"github.com/jchen42703/create-fullstack/cmd/root"
 	"github.com/jchen42703/create-fullstack/internal/executable"
 	"github.com/jchen42703/create-fullstack/internal/log"
-	"github.com/mitchellh/cli"
 )
 
 type exitCode int
@@ -32,37 +31,25 @@ func main() {
 // Based on Github's gh CLI (which also uses cobra)
 // https://github.com/cli/cli/blob/trunk/cmd/gh/main.go
 func runMain() exitCode {
-	Ui := &cli.BasicUi{
-		Writer:      os.Stdout,
-		ErrorWriter: os.Stderr,
-		Reader:      os.Stdin,
-	}
-
-	colorUi := &cli.ColoredUi{
-		OutputColor: cli.UiColorNone,
-		InfoColor:   cli.UiColorGreen,
-		ErrorColor:  cli.UiColorRed,
-		WarnColor:   cli.UiColorYellow,
-		Ui:          Ui,
-	}
 	// TODO: Check for CLI updates
+	ioStreams := iostreams.System()
+	cs := ioStreams.ColorScheme()
 
 	// TODO: dynamically get the log file path for different OSes
 	logFilePath := "./create-fullstack.log"
 	// Initialize logger. Uses CFS_LOG_LVL env var to determine the log level.
 	logger, err := log.CreateLogger(logFilePath)
 	if err != nil {
-		colorUi.Error(fmt.Sprintf("Error initializing logger: %s", err.Error()))
+		fmt.Fprint(os.Stderr, cs.Redf("Error initializing logger: %s", err.Error()))
 		return exitError
 	}
 
 	// TODO: set the pager command for making viewing logs cleaner.
-	io := iostreams.System()
 	currentTime := time.Now()
 	cmdCtx := &context.CmdContext{
 		Version:          "0.0.0-dev",
 		BuildDate:        currentTime.Format("2006-01-02"),
-		IoStreams:        io,
+		IoStreams:        ioStreams,
 		ExecutableName:   executable.GetPath("create-fullstack"),
 		Logger:           logger,
 		GlobalPluginsDir: context.GetGlobalPluginsDir(runtime.GOOS),
@@ -72,7 +59,7 @@ func runMain() exitCode {
 		if err := logger.Sync(); err != nil {
 			// this sync error is safe to ignore, since stdout doesn't support syncing in Linux/OS X
 			if !strings.HasSuffix(err.Error(), "sync /dev/stdout: invalid argument") {
-				colorUi.Error(fmt.Sprintf("Error cleaning up logger: %s", err.Error()))
+				fmt.Fprint(os.Stderr, cs.Redf("Error cleaning up logger: %s", err.Error()))
 			}
 		}
 	}()
@@ -94,7 +81,7 @@ func runMain() exitCode {
 	rootCmd := root.NewCmdRoot(cmdCtx)
 	err = rootCmd.Execute()
 	if err != nil {
-		colorUi.Error(err.Error())
+		fmt.Fprint(os.Stderr, cs.Redf("Failed to execute command: %s\n", err.Error()))
 		return exitError
 	}
 

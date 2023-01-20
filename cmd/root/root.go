@@ -28,6 +28,8 @@ func NewCmdRoot(cmdCtx *context.CmdContext) *cobra.Command {
 		Annotations: map[string]string{
 			"versionInfo": versionCmd.Format(cmdCtx.Version, cmdCtx.BuildDate),
 		},
+		SilenceUsage:  true,
+		SilenceErrors: true,
 	}
 
 	cmd.PersistentFlags().Bool("help", false, "Show help for command")

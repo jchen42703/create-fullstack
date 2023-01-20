@@ -16,7 +16,7 @@ func NewListCmd(cmdCtx *context.CmdContext) *cobra.Command {
 		Use:     "list",
 		GroupID: "plugins",
 		Short:   "List all installed plugins.",
-		Run: func(cmd *cobra.Command, args []string) {
+		RunE: func(cmd *cobra.Command, args []string) error {
 			logger := hclog.New(&hclog.LoggerOptions{
 				Name:   "plugin",
 				Output: os.Stdout,
@@ -25,13 +25,26 @@ func NewListCmd(cmdCtx *context.CmdContext) *cobra.Command {
 
 			installer, err := cfsplugin.NewAugmentorPluginInstaller(cmdCtx.GlobalPluginsDir, logger)
 			if err != nil {
-				// idk what to do here lol
-				fmt.Println("NewAugmentorPluginInstaller: ", err)
-				return
+				return fmt.Errorf("failed to initialize plugin installer: %s", err)
 			}
 
-			fmt.Println("List all installed plugins")
-			fmt.Println(installer.GetAllPlugins())
+			cs := cmdCtx.IoStreams.ColorScheme()
+			allPlugins, err := installer.GetAllPlugins()
+			if err != nil {
+				return fmt.Errorf("failed to view all installed plugins: %s", err)
+			}
+
+			if len(allPlugins) == 0 {
+				fmt.Fprint(os.Stdout, cs.Yellowf("No installed plugins found in the plugin directory '%s'.\nPlease run `create-fullstack plugins install <YOUR_PLUGIN_URL>` to install plugins.\n", cmdCtx.GlobalPluginsDir))
+				return nil
+			}
+
+			fmt.Fprint(os.Stdout, cs.Bold("All Installed Plugins:\n"))
+			for _, plugin := range allPlugins {
+				fmt.Fprint(os.Stdout, cs.Grayf("%s [%s]\n", plugin.Id, plugin.Version))
+			}
+
+			return nil
 		},
 	}
 
