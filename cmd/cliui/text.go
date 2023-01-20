@@ -53,6 +53,18 @@ func (ui *ColorUi) Log(t string) {
 	fmt.Fprint(ui.IoStreams.Out, t)
 }
 
+func (ui *ColorUi) Logf(t string, args ...interface{}) {
+	fmt.Fprintf(ui.IoStreams.Out, t, args...)
+}
+
 func (ui *ColorUi) Bold(t string) {
 	fmt.Fprint(ui.IoStreams.Out, ui.colorScheme.Bold(t))
+}
+
+func (ui *ColorUi) Success(t string) {
+	fmt.Fprint(ui.IoStreams.Out, ui.colorScheme.SuccessIcon()+" "+ui.colorScheme.Green(t))
+}
+
+func (ui *ColorUi) Successf(t string, args ...interface{}) {
+	fmt.Fprint(ui.IoStreams.Out, ui.colorScheme.SuccessIcon()+" "+ui.colorScheme.Greenf(t, args...))
 }
