@@ -1,6 +1,7 @@
 package main
 
 import (
+	"errors"
 	"fmt"
 	"os"
 	"runtime"
@@ -12,6 +13,7 @@ import (
 	"github.com/jchen42703/create-fullstack/cmd/root"
 	"github.com/jchen42703/create-fullstack/internal/executable"
 	"github.com/jchen42703/create-fullstack/internal/log"
+	"github.com/spf13/cobra"
 )
 
 type exitCode int
@@ -78,10 +80,21 @@ func runMain() exitCode {
 	// 6. Executes the rootCmd
 	// 7. Checks if it errors out. Handles the error to provide a better UX.
 
+	var SilentErr = errors.New("SilentErr")
 	rootCmd := root.NewCmdRoot(cmdCtx)
+	// Only prints usage for flag errors
+	rootCmd.SetFlagErrorFunc(func(cmd *cobra.Command, err error) error {
+		fmt.Fprintln(os.Stderr, cs.Red(err.Error()))
+		cmd.Println("\n" + cmd.UsageString())
+		return SilentErr
+	})
+
 	err = rootCmd.Execute()
 	if err != nil {
-		fmt.Fprint(os.Stderr, cs.Redf("Failed to execute command: %s\n", err.Error()))
+		if err != SilentErr {
+			fmt.Fprint(os.Stderr, cs.Redf("Failed to execute command: %s\n", err.Error()))
+		}
+
 		return exitError
 	}
 
