@@ -1,17 +1,18 @@
 package main
 
 import (
-	"fmt"
+	"errors"
 	"os"
+	"runtime"
 	"strings"
 	"time"
 
-	"github.com/cli/cli/v2/pkg/iostreams"
+	"github.com/jchen42703/create-fullstack/cmd/cliui"
 	"github.com/jchen42703/create-fullstack/cmd/context"
 	"github.com/jchen42703/create-fullstack/cmd/root"
 	"github.com/jchen42703/create-fullstack/internal/executable"
 	"github.com/jchen42703/create-fullstack/internal/log"
-	"github.com/mitchellh/cli"
+	"github.com/spf13/cobra"
 )
 
 type exitCode int
@@ -31,46 +32,34 @@ func main() {
 // Based on Github's gh CLI (which also uses cobra)
 // https://github.com/cli/cli/blob/trunk/cmd/gh/main.go
 func runMain() exitCode {
-	Ui := &cli.BasicUi{
-		Writer:      os.Stdout,
-		ErrorWriter: os.Stderr,
-		Reader:      os.Stdin,
-	}
-
-	colorUi := &cli.ColoredUi{
-		OutputColor: cli.UiColorNone,
-		InfoColor:   cli.UiColorGreen,
-		ErrorColor:  cli.UiColorRed,
-		WarnColor:   cli.UiColorYellow,
-		Ui:          Ui,
-	}
 	// TODO: Check for CLI updates
+	cliUi := cliui.NewColorUi()
 
 	// TODO: dynamically get the log file path for different OSes
 	logFilePath := "./create-fullstack.log"
 	// Initialize logger. Uses CFS_LOG_LVL env var to determine the log level.
 	logger, err := log.CreateLogger(logFilePath)
 	if err != nil {
-		colorUi.Error(fmt.Sprintf("Error initializing logger: %s", err.Error()))
+		cliUi.Errorf("Error initializing logger: %s", err.Error())
 		return exitError
 	}
 
 	// TODO: set the pager command for making viewing logs cleaner.
-	io := iostreams.System()
 	currentTime := time.Now()
 	cmdCtx := &context.CmdContext{
-		Version:        "0.0.0-dev",
-		BuildDate:      currentTime.Format("2006-01-02"),
-		IoStreams:      io,
-		ExecutableName: executable.GetPath("create-fullstack"),
-		Logger:         logger,
+		Version:          "0.0.0-dev",
+		BuildDate:        currentTime.Format("2006-01-02"),
+		CliUi:            cliUi,
+		ExecutableName:   executable.GetPath("create-fullstack"),
+		Logger:           logger,
+		GlobalPluginsDir: context.GetGlobalPluginsDir(runtime.GOOS),
 	}
 
 	defer func() {
 		if err := logger.Sync(); err != nil {
 			// this sync error is safe to ignore, since stdout doesn't support syncing in Linux/OS X
 			if !strings.HasSuffix(err.Error(), "sync /dev/stdout: invalid argument") {
-				colorUi.Error(fmt.Sprintf("Error cleaning up logger: %s", err.Error()))
+				cliUi.Errorf("Error cleaning up logger: %s", err.Error())
 			}
 		}
 	}()
@@ -89,10 +78,21 @@ func runMain() exitCode {
 	// 6. Executes the rootCmd
 	// 7. Checks if it errors out. Handles the error to provide a better UX.
 
+	var SilentErr = errors.New("SilentErr")
 	rootCmd := root.NewCmdRoot(cmdCtx)
+	// Only prints usage for flag errors
+	rootCmd.SetFlagErrorFunc(func(cmd *cobra.Command, err error) error {
+		cliUi.Error(err.Error() + "\n")
+		cliUi.Log("\n" + cmd.UsageString())
+		return SilentErr
+	})
+
 	err = rootCmd.Execute()
 	if err != nil {
-		colorUi.Error(err.Error())
+		if err != SilentErr {
+			cliUi.Errorf("Failed to execute command: %s\n", err.Error())
+		}
+
 		return exitError
 	}
 

@@ -17,7 +17,7 @@ func NewCmd(cmdCtx *context.CmdContext) *cobra.Command {
 		Use:    "version",
 		Hidden: true,
 		Run: func(cmd *cobra.Command, args []string) {
-			fmt.Fprint(cmdCtx.IoStreams.Out, cmd.Root().Annotations["versionInfo"])
+			cmdCtx.CliUi.Log(cmd.Root().Annotations["versionInfo"])
 		},
 	}
 
