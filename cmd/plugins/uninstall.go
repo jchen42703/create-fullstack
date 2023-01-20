@@ -13,7 +13,7 @@ import (
 
 // Creates the command to list all installed plugins.
 func NewUninstallCmd(cmdCtx *context.CmdContext) *cobra.Command {
-	listCmd := &cobra.Command{
+	uninstallCmd := &cobra.Command{
 		Use:     "uninstall",
 		GroupID: "plugins",
 		Short:   "Uninstall a plugin from plugin id(s).",
@@ -50,5 +50,5 @@ func NewUninstallCmd(cmdCtx *context.CmdContext) *cobra.Command {
 		},
 	}
 
-	return listCmd
+	return uninstallCmd
 }
