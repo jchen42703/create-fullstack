@@ -31,7 +31,7 @@ func NewCmd(cmdCtx *context.CmdContext) *cobra.Command {
 		Title: "Plugins Commands",
 	})
 
-	pluginsCmd.AddCommand(NewListCmd(cmdCtx), NewInstallCmd(cmdCtx))
+	pluginsCmd.AddCommand(NewListCmd(cmdCtx), NewInstallCmd(cmdCtx), NewUninstallCmd(cmdCtx))
 
 	return pluginsCmd
 }
