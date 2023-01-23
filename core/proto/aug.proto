@@ -1,0 +1,18 @@
+syntax = "proto3";
+package proto;
+option go_package = "./proto";
+
+message IdResponse {
+    string id  = 1;
+}
+
+message AugmentResponse {
+    string err = 1;
+}
+
+message Empty {}
+
+service TemplateAugmentor {
+    rpc Id(Empty) returns (IdResponse);
+    rpc Augment(Empty) returns (Empty);
+}

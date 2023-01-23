@@ -1,10 +1,12 @@
 package plugin
 
 import (
-	"net/rpc"
+	"context"
 
 	"github.com/hashicorp/go-plugin"
 	"github.com/jchen42703/create-fullstack/core/aug"
+	"github.com/jchen42703/create-fullstack/core/proto"
+	"google.golang.org/grpc"
 )
 
 // Handshake is a common handshake that is shared by plugin and host.
@@ -16,61 +18,67 @@ var AugmentPluginHandshake = plugin.HandshakeConfig{
 }
 
 // RPC Client to get Augmentor function results from server
-type AugmentorRpcClient struct {
-	client *rpc.Client
+type AugmentorGrpcClient struct {
+	client proto.TemplateAugmentorClient
 }
 
-func (g *AugmentorRpcClient) Id() string {
-	var resp string
-	err := g.client.Call("Plugin.Id", new(interface{}), &resp)
+func (g *AugmentorGrpcClient) Id() string {
+	// return resp
+	resp, err := g.client.Id(context.Background(), &proto.Empty{})
 	if err != nil {
-		// You usually want your interfaces to return errors. If they don't,
-		// there isn't much other choice here.
+		// This is bad
 		panic(err)
 	}
 
-	return resp
+	return resp.Id
 }
 
-func (g *AugmentorRpcClient) Augment() error {
-	err := g.client.Call("Plugin.Augment", new(interface{}), nil)
+func (g *AugmentorGrpcClient) Augment() error {
+	_, err := g.client.Augment(context.Background(), &proto.Empty{})
 	if err != nil {
-		// You usually want your interfaces to return errors. If they don't,
-		// there isn't much other choice here.
 		return err
 	}
 
 	return nil
 }
 
-// Here is the RPC server that AugmentorRpcClient talks to, conforming to
+// Here is the RPC server that AugmentorGrpcClient talks to, conforming to
 // the requirements of net/rpc
-type AugmentorRpcServer struct {
+type AugmentorGrpcServer struct {
+	proto.UnimplementedTemplateAugmentorServer
 	// This is the real implementation
 	Impl aug.TemplateAugmentor
 }
 
-func (s *AugmentorRpcServer) Id(args interface{}, resp *string) error {
-	*resp = s.Impl.Id()
-	return nil
+func (s *AugmentorGrpcServer) Id(ctx context.Context, req *proto.Empty) (*proto.IdResponse, error) {
+	return &proto.IdResponse{
+		Id: s.Impl.Id(),
+	}, nil
 }
 
-func (s *AugmentorRpcServer) Augment(args interface{}, resp *string) error {
-	return s.Impl.Augment()
+func (s *AugmentorGrpcServer) Augment(ctx context.Context, req *proto.Empty) (*proto.Empty, error) {
+	err := s.Impl.Augment()
+	if err != nil {
+		return &proto.Empty{}, err
+	}
+
+	return &proto.Empty{}, nil
 }
 
 // This is necessary for actually serving the interface implementation.
 type AugmentorPlugin struct {
+	plugin.Plugin
 	// Impl is the interface
 	Impl aug.TemplateAugmentor
 }
 
-func (p *AugmentorPlugin) Server(*plugin.MuxBroker) (interface{}, error) {
-	return &AugmentorRpcServer{Impl: p.Impl}, nil
+func (p *AugmentorPlugin) GRPCServer(broker *plugin.GRPCBroker, s *grpc.Server) error {
+	proto.RegisterTemplateAugmentorServer(s, &AugmentorGrpcServer{Impl: p.Impl})
+	return nil
 }
 
-func (p *AugmentorPlugin) Client(b *plugin.MuxBroker, c *rpc.Client) (interface{}, error) {
-	return &AugmentorRpcClient{client: c}, nil
+func (p *AugmentorPlugin) GRPCClient(ctx context.Context, broker *plugin.GRPCBroker, c *grpc.ClientConn) (interface{}, error) {
+	return &AugmentorGrpcClient{client: proto.NewTemplateAugmentorClient(c)}, nil
 }
 
 var AugmentorManager = &PluginManager[aug.TemplateAugmentor]{

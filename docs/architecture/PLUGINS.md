@@ -237,6 +237,53 @@ The way Terraform does it is by serving a `GRPCProviderPlugin`. This is analogou
 
 - This is similar to how in the tutorial, `GRPCClient` and `GRPCServer` actually implement the GRPC interactions.
 
+## Plugin Discovery
+
+Factors to consider:
+
+- Multi-Language Plugins
+  - Means that build scripts are different
+- From central plugin directory
+
+**Metadata**
+
+- Id
+- InstallLink
+- Version
+- Script
+  - Run with exec.Command
+
+Go:
+
+```go
+go build -o proto .
+```
+
+Python:
+
+```go
+python ./plugin/plugin.py
+```
+
+Likely, no script command, but just hard code the config entrypoint.
+
+Should autodetect the language from the `entrypoint`
+
+```json
+{
+  "entrypoint": "plugin.py"
+}
+```
+
+Also, likely don't need to copy over the plugin dir.
+
+i.e.
+
+1. install github dir directory into the global plugin dir directly.
+2. Then, rename it to the id
+
+If find duplicate dir, overwrite older (allows for upgrade).
+
 ## Resources
 
 - https://github.com/hashicorp/otto/blob/v0.2.0/command/plugin_manager.go

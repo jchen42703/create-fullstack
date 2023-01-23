@@ -5,4 +5,5 @@ type PluginMeta struct {
 	Id          string `json:"pluginId"`    // GitHubUsername-NameOfPluginStruct; used to name the folder
 	Version     string `json:"version"`     // could do a semi-ver, could be git commit hash, etc.
 	InstallLink string `json:"installLink"` // i.e. https://github.com/xxxx/example-plugin-repo
+	Entrypoint  string `json:"entrypoint"`  // used to determine how to build the plugin i.e. what main.go, plugin.py...
 }
