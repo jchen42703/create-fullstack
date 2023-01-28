@@ -18,12 +18,14 @@ type UiAugmentOptions struct {
 	AddStyledComponents *opts.PackageOptions `yaml:"styled_components" validate:"required"`
 	HuskyOpts           *HuskyOptions        `yaml:"husky" validate:"required"`
 	AddDockerfile       bool                 `yaml:"dockerfile" validate:"required,boolean"`
-	GitOpts             *struct {
-		AddIssueTemplates bool `yaml:"issue_templates" validate:"required,boolean"`
-		AddPRTemplates    bool `yaml:"pr_templates" validate:"required,boolean"`
-	} `yaml:"git" validate:"required"`
+	GitOpts             *GitOptions          `yaml:"gitopts" validate:"required"`
 
 	AddCi string `yaml:"ci" validate:"required,oneof=circleci travisci jenkins git_workflows"`
+}
+
+type GitOptions struct {
+	AddIssueTemplates bool `yaml:"issue_templates" validate:"boolean"`
+	AddPRTemplates    bool `yaml:"pr_templates" validate:"boolean"`
 }
 
 type TemplateConfig struct {
